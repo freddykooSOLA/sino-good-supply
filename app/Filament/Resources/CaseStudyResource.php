@@ -7,6 +7,7 @@ use App\Filament\Support\TranslationForm;
 use App\Models\CaseStudy;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -29,12 +30,42 @@ class CaseStudyResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Radio::make('video_type')
+                    ->label('视频来源')
+                    ->options([
+                        CaseStudy::VIDEO_YOUTUBE => 'YouTube 链接',
+                        CaseStudy::VIDEO_UPLOAD => '上传视频文件',
+                    ])
+                    ->default(CaseStudy::VIDEO_YOUTUBE)
+                    ->inline()
+                    ->live()
+                    ->required()
+                    ->columnSpanFull(),
                 Forms\Components\TextInput::make('youtube_url')
                     ->label('YouTube 链接')
                     ->placeholder('https://www.youtube.com/watch?v=...')
-                    ->required()
                     ->url()
                     ->helperText('粘贴完整 YouTube 视频链接，系统会自动解析视频 ID')
+                    ->required(fn (Get $get): bool => $get('video_type') === CaseStudy::VIDEO_YOUTUBE)
+                    ->visible(fn (Get $get): bool => $get('video_type') === CaseStudy::VIDEO_YOUTUBE)
+                    ->columnSpanFull(),
+                Forms\Components\FileUpload::make('video_path')
+                    ->label('上传视频')
+                    ->helperText('支持 MP4 / WebM / MOV，最大 40MB')
+                    ->disk('public')
+                    ->directory('case-videos')
+                    ->visibility('public')
+                    ->acceptedFileTypes([
+                        'video/mp4',
+                        'video/webm',
+                        'video/quicktime',
+                        'video/x-m4v',
+                    ])
+                    ->maxSize(40960)
+                    ->downloadable()
+                    ->openable()
+                    ->required(fn (Get $get): bool => $get('video_type') === CaseStudy::VIDEO_UPLOAD)
+                    ->visible(fn (Get $get): bool => $get('video_type') === CaseStudy::VIDEO_UPLOAD)
                     ->columnSpanFull(),
                 TranslationForm::toolbar([
                     'title_en' => ['zh' => 'title_zh', 'zh_hant' => 'title_zh_hant'],
@@ -102,19 +133,31 @@ class CaseStudyResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('youtube_id')
+                Tables\Columns\ImageColumn::make('preview')
                     ->label('预览')
                     ->getStateUsing(fn (CaseStudy $record) => $record->thumbnailUrl())
                     ->height(54)
-                    ->width(96),
+                    ->width(96)
+                    ->defaultImageUrl(url('/favicon.ico')),
+                Tables\Columns\TextColumn::make('video_type')
+                    ->label('来源')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => $state === CaseStudy::VIDEO_UPLOAD ? '本地视频' : 'YouTube')
+                    ->color(fn (?string $state): string => $state === CaseStudy::VIDEO_UPLOAD ? 'warning' : 'info'),
                 Tables\Columns\TextColumn::make('title_zh')
                     ->label('标题')
                     ->searchable()
                     ->description(fn (CaseStudy $record) => $record->title_en),
-                Tables\Columns\TextColumn::make('youtube_url')
-                    ->label('YouTube')
-                    ->limit(40)
-                    ->url(fn (CaseStudy $record) => $record->youtube_url, true)
+                Tables\Columns\TextColumn::make('media')
+                    ->label('视频')
+                    ->getStateUsing(function (CaseStudy $record): string {
+                        if ($record->isUploadedVideo()) {
+                            return basename((string) $record->video_path);
+                        }
+
+                        return $record->youtube_url ?: '—';
+                    })
+                    ->limit(36)
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label('排序')
@@ -129,6 +172,12 @@ class CaseStudyResource extends Resource
             ])
             ->defaultSort('sort_order')
             ->filters([
+                Tables\Filters\SelectFilter::make('video_type')
+                    ->label('视频来源')
+                    ->options([
+                        CaseStudy::VIDEO_YOUTUBE => 'YouTube',
+                        CaseStudy::VIDEO_UPLOAD => '本地视频',
+                    ]),
                 Tables\Filters\TernaryFilter::make('is_active')->label('启用状态'),
             ])
             ->actions([

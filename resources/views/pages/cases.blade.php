@@ -20,7 +20,17 @@
                     @foreach($cases as $case)
                         <article class="group">
                             <div class="aspect-video overflow-hidden bg-primary-black">
-                                @if($case->embedUrl())
+                                @if($case->isUploadedVideo() && $case->uploadedVideoUrl())
+                                    <video
+                                        class="h-full w-full object-cover"
+                                        controls
+                                        preload="metadata"
+                                        playsinline
+                                        src="{{ $case->uploadedVideoUrl() }}"
+                                    >
+                                        {{ $case->localizedTitle() }}
+                                    </video>
+                                @elseif($case->embedUrl())
                                     <iframe
                                         class="h-full w-full"
                                         src="{{ $case->embedUrl() }}"
@@ -34,6 +44,8 @@
                                     <a href="{{ $case->youtube_url }}" target="_blank" rel="noopener">
                                         <img src="{{ $case->thumbnailUrl() }}" alt="{{ $case->localizedTitle() }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                                     </a>
+                                @else
+                                    <div class="flex h-full items-center justify-center text-xs tracking-widest text-white/30">SINO GOOD</div>
                                 @endif
                             </div>
                             <h2 class="mt-4 text-lg font-medium text-white">{{ $case->localizedTitle() }}</h2>
