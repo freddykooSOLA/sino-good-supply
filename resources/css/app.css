@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --primary-black: #1a1a1a;
+    --charcoal: #2c2c2c;
+    --gold-accent: #c9a84c;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        background: var(--charcoal);
+        color: #fff;
+    }
+}
+
+@layer components {
+    .nav-link {
+        @apply text-sm font-medium tracking-wide text-white/80 transition hover:text-gold-accent;
+    }
+
+    .btn-gold {
+        @apply inline-flex items-center justify-center bg-gold-accent px-6 py-3 text-sm font-semibold tracking-wide text-primary-black transition hover:bg-[#d4b65c];
+    }
+
+    .btn-outline {
+        @apply inline-flex items-center justify-center border border-white/30 px-6 py-3 text-sm font-semibold tracking-wide text-white transition hover:border-gold-accent hover:text-gold-accent;
+    }
+
+    .section-pad {
+        @apply mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-24;
+    }
+
+    .section-title {
+        @apply text-2xl font-semibold tracking-tight text-white md:text-3xl;
+    }
+
+    .section-sub {
+        @apply mt-3 max-w-2xl text-sm leading-relaxed text-white/65 md:text-base;
+    }
+
+    .fade-up {
+        animation: fadeUp 0.8s ease both;
+    }
+
+    .fade-in {
+        animation: fadeIn 1s ease both;
+    }
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.hero-slide {
+    animation: heroKenBurns 18s ease-in-out infinite alternate;
+}
+
+@keyframes heroKenBurns {
+    from { transform: scale(1); }
+    to { transform: scale(1.06); }
+}
