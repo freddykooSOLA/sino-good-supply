@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -56,62 +57,76 @@ class TranslationService
             return '';
         }
 
-        $chunks = $this->chunk($text, 450);
-        $translated = [];
+        $target = $this->normalizeTarget($target);
+        $cacheKey = 'tr:gtx:'.md5($target.'|'.$text);
 
-        foreach ($chunks as $chunk) {
-            $translated[] = $this->translateChunk($chunk, $target);
-            usleep(150000);
-        }
+        return Cache::remember($cacheKey, now()->addDays(30), function () use ($text, $target) {
+            $chunks = $this->chunk($text, 1500);
+            $translated = [];
 
-        return trim(implode("\n", $translated));
+            foreach ($chunks as $chunk) {
+                $translated[] = $this->translateViaGoogleGtx($chunk, $target);
+                usleep(80000);
+            }
+
+            return trim(implode("\n", array_filter($translated, fn ($line) => $line !== '')));
+        });
     }
 
-    protected function translateChunk(string $text, string $target): string
+    protected function translateViaGoogleGtx(string $text, string $target): string
     {
-        $langPair = match ($target) {
-            'zh', 'zh-CN', 'zh_CN' => 'en|zh-CN',
-            'zh-TW', 'zh_hant', 'zh-Hant' => 'en|zh-TW',
-            default => 'en|'.$target,
-        };
-
         try {
-            $response = Http::timeout(20)
-                ->acceptJson()
-                ->get('https://api.mymemory.translated.net/get', array_filter([
+            $response = Http::timeout(25)
+                ->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (compatible; SINOGOOD-Translator/1.0)',
+                ])
+                ->get('https://translate.googleapis.com/translate_a/single', [
+                    'client' => 'gtx',
+                    'sl' => 'en',
+                    'tl' => $target,
+                    'dt' => 't',
                     'q' => $text,
-                    'langpair' => $langPair,
-                    'de' => config('services.translation.email'),
-                ]));
+                ]);
 
             if (! $response->successful()) {
-                Log::warning('Translation API HTTP error', [
+                Log::warning('Google GTX translation HTTP error', [
                     'status' => $response->status(),
-                    'body' => $response->body(),
+                    'target' => $target,
                 ]);
 
                 return $text;
             }
 
-            $translated = data_get($response->json(), 'responseData.translatedText');
+            $json = $response->json();
 
-            if (! is_string($translated) || $translated === '') {
+            if (! is_array($json) || ! isset($json[0]) || ! is_array($json[0])) {
                 return $text;
             }
 
-            // MyMemory sometimes returns the QUERY itself on quota errors.
-            if (str_contains($translated, 'MYMEMORY WARNING')) {
-                Log::warning('Translation API quota warning', ['text' => $translated]);
-
-                return $text;
+            $out = '';
+            foreach ($json[0] as $segment) {
+                if (is_array($segment) && isset($segment[0]) && is_string($segment[0])) {
+                    $out .= $segment[0];
+                }
             }
 
-            return html_entity_decode($translated, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $out = trim(html_entity_decode($out, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+
+            return $out !== '' ? $out : $text;
         } catch (Throwable $e) {
-            Log::error('Translation failed: '.$e->getMessage());
+            Log::error('Google GTX translation failed: '.$e->getMessage());
 
             return $text;
         }
+    }
+
+    protected function normalizeTarget(string $target): string
+    {
+        return match ($target) {
+            'zh', 'zh-CN', 'zh_CN', 'zh_Hans', 'zh-Hans' => 'zh-CN',
+            'zh-TW', 'zh_hant', 'zh-Hant', 'zh_Hant', 'zh-HK' => 'zh-TW',
+            default => $target,
+        };
     }
 
     /**

@@ -36,8 +36,9 @@ return [
     ],
 
     'translation' => [
-        // Optional MyMemory email raises free daily quota.
+        // Kept for compatibility; current driver uses Google GTX (no API key / no account quota).
         'email' => env('TRANSLATION_EMAIL'),
+        'driver' => env('TRANSLATION_DRIVER', 'google_gtx'),
     ],
 
 ];
