@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
+use App\Support\ImageCompressor;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
@@ -11,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class ProductResource extends Resource
 {
@@ -114,12 +116,27 @@ class ProductResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('images')
                     ->label('产品图片')
+                    ->helperText('请上传 1–5 张图片。系统会自动压缩到每张 200KB 以下。')
                     ->image()
                     ->multiple()
                     ->reorderable()
+                    ->minFiles(1)
+                    ->maxFiles(5)
+                    ->maxSize(10240)
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
                     ->directory('products')
                     ->disk('public')
+                    ->visibility('public')
                     ->imageEditor()
+                    ->saveUploadedFileUsing(function (TemporaryUploadedFile $file): string {
+                        return ImageCompressor::storeUnderLimit(
+                            file: $file,
+                            directory: 'products',
+                            maxKilobytes: 200,
+                            disk: 'public',
+                            maxDimension: 1600,
+                        );
+                    })
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('pdf_path')
                     ->label('产品PDF目录')
