@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CaseStudyResource\Pages;
+use App\Filament\Support\TranslationForm;
 use App\Models\CaseStudy;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -35,6 +36,10 @@ class CaseStudyResource extends Resource
                     ->url()
                     ->helperText('粘贴完整 YouTube 视频链接，系统会自动解析视频 ID')
                     ->columnSpanFull(),
+                TranslationForm::toolbar([
+                    'title_en' => ['zh' => 'title_zh', 'zh_hant' => 'title_zh_hant'],
+                    'description_en' => ['zh' => 'description_zh', 'zh_hant' => 'description_zh_hant'],
+                ]),
                 Forms\Components\Tabs::make('语言内容')
                     ->tabs([
                         Forms\Components\Tabs\Tab::make('英文')
@@ -50,25 +55,35 @@ class CaseStudyResource extends Resource
                             ]),
                         Forms\Components\Tabs\Tab::make('简体中文')
                             ->schema([
+                                TranslationForm::editZhToggle(),
                                 Forms\Components\TextInput::make('title_zh')
                                     ->label('标题')
                                     ->required()
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->disabled(TranslationForm::zhLocked())
+                                    ->dehydrated(),
                                 Forms\Components\Textarea::make('description_zh')
                                     ->label('说明')
                                     ->rows(4)
-                                    ->columnSpanFull(),
+                                    ->columnSpanFull()
+                                    ->disabled(TranslationForm::zhLocked())
+                                    ->dehydrated(),
                             ]),
                         Forms\Components\Tabs\Tab::make('繁体中文')
                             ->schema([
+                                TranslationForm::editZhHantToggle(),
                                 Forms\Components\TextInput::make('title_zh_hant')
                                     ->label('标题')
                                     ->required()
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->disabled(TranslationForm::zhHantLocked())
+                                    ->dehydrated(),
                                 Forms\Components\Textarea::make('description_zh_hant')
                                     ->label('说明')
                                     ->rows(4)
-                                    ->columnSpanFull(),
+                                    ->columnSpanFull()
+                                    ->disabled(TranslationForm::zhHantLocked())
+                                    ->dehydrated(),
                             ]),
                     ])
                     ->columnSpanFull(),

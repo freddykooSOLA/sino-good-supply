@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
+use App\Filament\Support\TranslationForm;
 use App\Models\Category;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -30,6 +31,9 @@ class CategoryResource extends Resource
     {
         return $form
             ->schema([
+                TranslationForm::toolbar([
+                    'name_en' => ['zh' => 'name_zh', 'zh_hant' => 'name_zh_hant', 'slug' => true],
+                ]),
                 Forms\Components\Tabs::make('语言内容')
                     ->tabs([
                         Forms\Components\Tabs\Tab::make('英文')
@@ -48,27 +52,37 @@ class CategoryResource extends Resource
                             ]),
                         Forms\Components\Tabs\Tab::make('简体中文')
                             ->schema([
+                                TranslationForm::editZhToggle(),
                                 Forms\Components\TextInput::make('name_zh')
                                     ->label('名称')
                                     ->required()
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->disabled(TranslationForm::zhLocked())
+                                    ->dehydrated(),
                                 Forms\Components\TextInput::make('slug_zh')
                                     ->label('URL别名')
                                     ->required()
                                     ->unique(ignoreRecord: true)
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->disabled(TranslationForm::zhLocked())
+                                    ->dehydrated(),
                             ]),
                         Forms\Components\Tabs\Tab::make('繁体中文')
                             ->schema([
+                                TranslationForm::editZhHantToggle(),
                                 Forms\Components\TextInput::make('name_zh_hant')
                                     ->label('名称')
                                     ->required()
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->disabled(TranslationForm::zhHantLocked())
+                                    ->dehydrated(),
                                 Forms\Components\TextInput::make('slug_zh_hant')
                                     ->label('URL别名')
                                     ->required()
                                     ->unique(ignoreRecord: true)
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->disabled(TranslationForm::zhHantLocked())
+                                    ->dehydrated(),
                             ]),
                     ])
                     ->columnSpanFull(),

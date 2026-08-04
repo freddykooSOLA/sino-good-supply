@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'translation' => [
+        // Optional MyMemory email raises free daily quota.
+        'email' => env('TRANSLATION_EMAIL'),
+    ],
+
 ];
