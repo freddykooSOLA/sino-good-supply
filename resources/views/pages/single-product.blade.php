@@ -3,7 +3,14 @@
 @section('title', $product->localizedName())
 
 @section('content')
-    <section class="bg-charcoal pt-28">
+    @include('partials.page-hero', [
+        'image' => $pageHero['image'] ?? null,
+        'title' => $product->localizedName(),
+        'subtitle' => $product->localizedShortDesc() ?: (localized_setting($pageHero, 'subtitle') ?: ''),
+        'compact' => true,
+    ])
+
+    <section class="bg-charcoal">
         <div class="mx-auto max-w-7xl px-4 py-8 text-sm text-white/50 lg:px-8">
             <a href="{{ locale_url() }}" class="hover:text-gold-accent">{{ __('messages.breadcrumb_home') }}</a>
             <span class="mx-2">/</span>
@@ -88,7 +95,6 @@
                 @if($product->category)
                     <div class="text-xs uppercase tracking-wider text-gold-accent">{{ $product->category->localizedName() }}</div>
                 @endif
-                <h1 class="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">{{ $product->localizedName() }}</h1>
                 @if($product->localizedShortDesc())
                     <p class="mt-5 text-base leading-relaxed text-white/70">{{ $product->localizedShortDesc() }}</p>
                 @endif

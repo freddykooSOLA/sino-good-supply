@@ -19,6 +19,50 @@ class SettingSeeder extends Seeder
             ],
         ]);
 
+        Setting::setValue('hero', [
+            'autoplay' => true,
+            'speed' => 5000,
+        ]);
+
+        Setting::setValue('page_heroes', [
+            'products' => [
+                'image' => null,
+                'title_en' => 'Products',
+                'title_zh' => '产品',
+                'title_zh_hant' => '產品',
+                'subtitle_en' => 'One-stop Building Materials Sourcing Partner for Europe\'s Finest Hotels',
+                'subtitle_zh' => '',
+                'subtitle_zh_hant' => '',
+            ],
+            'cases' => [
+                'image' => null,
+                'title_en' => 'Case Studies',
+                'title_zh' => '案例',
+                'title_zh_hant' => '案例',
+                'subtitle_en' => 'Selected hotel and hospitality projects delivered with SINO GOOD supply solutions.',
+                'subtitle_zh' => '',
+                'subtitle_zh_hant' => '',
+            ],
+            'about' => [
+                'image' => null,
+                'title_en' => 'About SINO GOOD',
+                'title_zh' => '关于我们',
+                'title_zh_hant' => '關於我們',
+                'subtitle_en' => 'SINO GOOD QY Supply Chain CO LTD is a building materials supplier specializing in European hotel projects.',
+                'subtitle_zh' => '',
+                'subtitle_zh_hant' => '',
+            ],
+            'contact' => [
+                'image' => null,
+                'title_en' => 'Get in Touch',
+                'title_zh' => '联系我们',
+                'title_zh_hant' => '聯絡我們',
+                'subtitle_en' => 'One-stop Building Materials Sourcing Partner for Europe\'s Finest Hotels',
+                'subtitle_zh' => '',
+                'subtitle_zh_hant' => '',
+            ],
+        ]);
+
         Setting::setValue('company_stats', [
             ['label_en' => 'Years of Experience', 'label_zh' => '年行业经验', 'label_zh_hant' => '年行業經驗', 'value' => '28'],
             ['label_en' => 'Hotels Served', 'label_zh' => '服务酒店', 'label_zh_hant' => '服務酒店', 'value' => '500+'],
@@ -37,6 +81,9 @@ class SettingSeeder extends Seeder
             'email' => 'info@sinogood.com',
             'whatsapp' => '',
             'wechat' => '',
+            'media_type' => 'none',
+            'media_image' => null,
+            'google_maps_embed' => '',
         ]);
 
         Setting::setValue('brand_logos', []);

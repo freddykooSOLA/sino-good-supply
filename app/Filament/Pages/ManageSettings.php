@@ -6,6 +6,7 @@ use App\Models\Setting;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 
@@ -27,10 +28,29 @@ class ManageSettings extends Page
 
     public function mount(): void
     {
+        $pageHeroDefaults = [
+            'products' => [],
+            'cases' => [],
+            'about' => [],
+            'contact' => [],
+        ];
+
         $this->form->fill([
             'hero_slides' => Setting::getValue('hero_slides', []) ?: [],
+            'hero' => array_merge([
+                'autoplay' => true,
+                'speed' => 5000,
+            ], Setting::getValue('hero', []) ?: []),
+            'page_heroes' => array_replace_recursive(
+                $pageHeroDefaults,
+                Setting::getValue('page_heroes', []) ?: []
+            ),
             'company_stats' => Setting::getValue('company_stats', []) ?: [],
-            'contact' => Setting::getValue('contact', []) ?: [],
+            'contact' => array_merge([
+                'media_type' => 'none',
+                'media_image' => null,
+                'google_maps_embed' => '',
+            ], Setting::getValue('contact', []) ?: []),
             'brand_logos' => Setting::getValue('brand_logos', []) ?: [],
         ]);
     }
@@ -43,6 +63,27 @@ class ManageSettings extends Page
                     ->tabs([
                         Forms\Components\Tabs\Tab::make('首页轮播')
                             ->schema([
+                                Forms\Components\Section::make('轮播设置')
+                                    ->schema([
+                                        Forms\Components\Toggle::make('autoplay')
+                                            ->label('启用自动轮播')
+                                            ->helperText('关闭后仅可通过左右按钮手动切换')
+                                            ->inline(false)
+                                            ->default(true)
+                                            ->live(),
+                                        Forms\Components\TextInput::make('speed')
+                                            ->label('轮播速度（毫秒）')
+                                            ->numeric()
+                                            ->minValue(2000)
+                                            ->maxValue(60000)
+                                            ->step(500)
+                                            ->default(5000)
+                                            ->helperText('建议 3000–8000，例如 5000 = 5 秒')
+                                            ->required()
+                                            ->visible(fn (Get $get): bool => (bool) $get('autoplay')),
+                                    ])
+                                    ->columns(2)
+                                    ->statePath('hero'),
                                 Forms\Components\Repeater::make('hero_slides')
                                     ->label('轮播幻灯片')
                                     ->schema([
@@ -69,6 +110,13 @@ class ManageSettings extends Page
                                     ->collapsible()
                                     ->itemLabel(fn (array $state): ?string => $state['title_en'] ?? '新幻灯片')
                                     ->columnSpanFull(),
+                            ]),
+                        Forms\Components\Tabs\Tab::make('页面头图')
+                            ->schema([
+                                $this->pageHeroSection('产品页', 'products'),
+                                $this->pageHeroSection('案例页', 'cases'),
+                                $this->pageHeroSection('关于我们', 'about'),
+                                $this->pageHeroSection('联系我们', 'contact'),
                             ]),
                         Forms\Components\Tabs\Tab::make('公司数据')
                             ->schema([
@@ -124,6 +172,34 @@ class ManageSettings extends Page
                                     ])
                                     ->columns(2)
                                     ->statePath('contact'),
+                                Forms\Components\Section::make('联系页媒体')
+                                    ->description('在联系表单旁显示图片或 Google 地图')
+                                    ->schema([
+                                        Forms\Components\Select::make('media_type')
+                                            ->label('显示方式')
+                                            ->options([
+                                                'none' => '不显示',
+                                                'image' => '上传图片',
+                                                'map' => 'Google 地图',
+                                            ])
+                                            ->default('none')
+                                            ->live()
+                                            ->required(),
+                                        Forms\Components\FileUpload::make('media_image')
+                                            ->label('联系页图片')
+                                            ->image()
+                                            ->directory('contact')
+                                            ->disk('public')
+                                            ->visibility('public')
+                                            ->visible(fn (Get $get): bool => $get('media_type') === 'image'),
+                                        Forms\Components\Textarea::make('google_maps_embed')
+                                            ->label('Google 地图嵌入')
+                                            ->rows(4)
+                                            ->helperText('粘贴 Google Maps「嵌入地图」的 iframe 代码，或直接粘贴 embed 网址')
+                                            ->visible(fn (Get $get): bool => $get('media_type') === 'map'),
+                                    ])
+                                    ->columns(1)
+                                    ->statePath('contact'),
                             ]),
                         Forms\Components\Tabs\Tab::make('品牌标识')
                             ->schema([
@@ -152,12 +228,50 @@ class ManageSettings extends Page
             ->statePath('data');
     }
 
+    protected function pageHeroSection(string $label, string $key): Forms\Components\Section
+    {
+        return Forms\Components\Section::make($label)
+            ->schema([
+                Forms\Components\FileUpload::make('image')
+                    ->label('头图')
+                    ->image()
+                    ->directory('page-heroes')
+                    ->disk('public')
+                    ->visibility('public')
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('title_en')
+                    ->label('英文标题'),
+                Forms\Components\TextInput::make('title_zh')
+                    ->label('简体标题'),
+                Forms\Components\TextInput::make('title_zh_hant')
+                    ->label('繁体标题'),
+                Forms\Components\Textarea::make('subtitle_en')
+                    ->label('英文副标题')
+                    ->rows(2),
+                Forms\Components\Textarea::make('subtitle_zh')
+                    ->label('简体副标题')
+                    ->rows(2),
+                Forms\Components\Textarea::make('subtitle_zh_hant')
+                    ->label('繁体副标题')
+                    ->rows(2),
+            ])
+            ->columns(3)
+            ->collapsed()
+            ->statePath("page_heroes.{$key}");
+    }
+
     public function save(): void
     {
         try {
             $state = $this->form->getState();
 
+            $hero = $state['hero'] ?? [];
+            $hero['autoplay'] = (bool) ($hero['autoplay'] ?? false);
+            $hero['speed'] = max(2000, (int) ($hero['speed'] ?? 5000));
+
             Setting::setValue('hero_slides', $state['hero_slides'] ?? []);
+            Setting::setValue('hero', $hero);
+            Setting::setValue('page_heroes', $state['page_heroes'] ?? []);
             Setting::setValue('company_stats', $state['company_stats'] ?? []);
             Setting::setValue('contact', $state['contact'] ?? []);
             Setting::setValue('brand_logos', $state['brand_logos'] ?? []);

@@ -15,15 +15,17 @@ class PageController extends Controller
     {
         $stats = Setting::getValue('company_stats', []);
         $contact = Setting::getValue('contact', []);
+        $pageHero = page_hero('about');
 
-        return view('pages.about', compact('stats', 'contact'));
+        return view('pages.about', compact('stats', 'contact', 'pageHero'));
     }
 
     public function contact(): View
     {
         $contact = Setting::getValue('contact', []);
+        $pageHero = page_hero('contact');
 
-        return view('pages.contact', compact('contact'));
+        return view('pages.contact', compact('contact', 'pageHero'));
     }
 
     public function sendContact(Request $request): RedirectResponse

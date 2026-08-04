@@ -14,6 +14,12 @@ Write-Host "==> Deploying SINO GOOD to SiteGround..."
 
 git push origin main
 
+# Ensure frontend production assets exist
+if (-not (Test-Path "public\build\manifest.json")) {
+    Write-Host "==> Building frontend assets..."
+    npm run build
+}
+
 $remote = @"
 set -euo pipefail
 cd '$SITE_PATH'
@@ -28,6 +34,10 @@ chmod -R 775 storage bootstrap/cache
 "@
 
 $remote | ssh -i $SSH_KEY -o IdentitiesOnly=yes -p $SSH_PORT "${SSH_USER}@${SSH_HOST}" bash
+
+# Sync Vite build (often gitignored)
+Write-Host "==> Syncing public/build assets..."
+scp -i $SSH_KEY -o IdentitiesOnly=yes -P $SSH_PORT -r "public\build" "${SSH_USER}@${SSH_HOST}:${SITE_PATH}/public/"
 
 Write-Host "==> Deployment complete!"
 Write-Host "Document Root must point to: $SITE_PATH/public"

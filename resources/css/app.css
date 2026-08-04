@@ -79,6 +79,21 @@
     to { transform: scale(1.06); }
 }
 
+.hero-carousel-slide {
+    opacity: 0;
+    transition: opacity 0.9s ease;
+    pointer-events: none;
+}
+
+.hero-carousel-slide.is-active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.hero-carousel-copy {
+    animation: fadeUp 0.7s ease both;
+}
+
 .product-slider {
     touch-action: pan-y;
     user-select: none;

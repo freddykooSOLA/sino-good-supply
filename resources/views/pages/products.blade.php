@@ -3,14 +3,13 @@
 @section('title', $activeCategory ? $activeCategory->localizedName() : __('messages.all_products'))
 
 @section('content')
-    <section class="border-b border-white/10 bg-primary-black pt-28">
-        <div class="mx-auto max-w-7xl px-4 py-12 lg:px-8">
-            <h1 class="text-3xl font-semibold tracking-tight text-white md:text-4xl">
-                {{ $activeCategory ? $activeCategory->localizedName() : __('messages.all_products') }}
-            </h1>
-            <p class="mt-3 max-w-2xl text-white/60">{{ __('messages.tagline') }}</p>
-        </div>
-    </section>
+    @include('partials.page-hero', [
+        'image' => $pageHero['image'] ?? null,
+        'title' => $activeCategory
+            ? $activeCategory->localizedName()
+            : (localized_setting($pageHero, 'title') ?: __('messages.all_products')),
+        'subtitle' => localized_setting($pageHero, 'subtitle') ?: __('messages.tagline'),
+    ])
 
     <section class="bg-charcoal">
         <div class="mx-auto grid max-w-7xl gap-10 px-4 py-14 lg:grid-cols-[240px_1fr] lg:px-8">

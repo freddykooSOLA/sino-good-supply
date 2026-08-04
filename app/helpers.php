@@ -63,6 +63,56 @@ if (! function_exists('nav_categories')) {
 if (! function_exists('site_contact')) {
     function site_contact(): array
     {
-        return once(fn () => Setting::getValue('contact', []));
+        return once(fn () => Setting::getValue('contact', []) ?: []);
+    }
+}
+
+if (! function_exists('page_hero')) {
+    function page_hero(string $page): array
+    {
+        $heroes = once(fn () => Setting::getValue('page_heroes', []) ?: []);
+
+        return is_array($heroes[$page] ?? null) ? $heroes[$page] : [];
+    }
+}
+
+if (! function_exists('hero_settings')) {
+    function hero_settings(): array
+    {
+        $defaults = [
+            'autoplay' => true,
+            'speed' => 5000,
+        ];
+
+        $hero = Setting::getValue('hero', []) ?: [];
+
+        return array_merge($defaults, is_array($hero) ? $hero : []);
+    }
+}
+
+if (! function_exists('google_maps_embed_src')) {
+    function google_maps_embed_src(?string $raw): ?string
+    {
+        if (! filled($raw)) {
+            return null;
+        }
+
+        $raw = trim($raw);
+
+        if (preg_match('/src=["\']([^"\']+)["\']/i', $raw, $matches)) {
+            $raw = html_entity_decode($matches[1], ENT_QUOTES);
+        }
+
+        if (! filter_var($raw, FILTER_VALIDATE_URL)) {
+            return null;
+        }
+
+        $host = strtolower((string) parse_url($raw, PHP_URL_HOST));
+
+        if ($host === '' || ! str_contains($host, 'google')) {
+            return null;
+        }
+
+        return $raw;
     }
 }

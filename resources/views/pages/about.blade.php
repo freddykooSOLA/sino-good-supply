@@ -3,14 +3,11 @@
 @section('title', __('messages.about_title'))
 
 @section('content')
-    <section class="relative min-h-[55vh] overflow-hidden bg-primary-black pt-28">
-        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(201,168,76,0.18),_transparent_60%)]"></div>
-        <div class="relative mx-auto flex min-h-[45vh] max-w-7xl flex-col justify-end px-4 pb-16 lg:px-8">
-            <div class="text-sm font-semibold tracking-[0.28em] text-gold-accent">SINO GOOD</div>
-            <h1 class="mt-4 max-w-3xl text-4xl font-semibold tracking-tight text-white md:text-5xl">{{ __('messages.about_title') }}</h1>
-            <p class="mt-5 max-w-2xl text-base leading-relaxed text-white/70 md:text-lg">{{ __('messages.about_intro') }}</p>
-        </div>
-    </section>
+    @include('partials.page-hero', [
+        'image' => $pageHero['image'] ?? null,
+        'title' => localized_setting($pageHero, 'title') ?: __('messages.about_title'),
+        'subtitle' => localized_setting($pageHero, 'subtitle') ?: __('messages.about_intro'),
+    ])
 
     <section class="bg-charcoal">
         <div class="section-pad">

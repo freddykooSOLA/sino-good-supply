@@ -3,13 +3,11 @@
 @section('title', __('messages.nav_cases'))
 
 @section('content')
-    <section class="bg-primary-black pt-28">
-        <div class="mx-auto max-w-7xl px-4 py-14 lg:px-8">
-            <div class="text-sm font-semibold tracking-[0.28em] text-gold-accent">SINO GOOD</div>
-            <h1 class="mt-4 text-4xl font-semibold tracking-tight text-white md:text-5xl">{{ __('messages.cases_title') }}</h1>
-            <p class="mt-4 max-w-2xl text-white/65">{{ __('messages.cases_intro') }}</p>
-        </div>
-    </section>
+    @include('partials.page-hero', [
+        'image' => $pageHero['image'] ?? null,
+        'title' => localized_setting($pageHero, 'title') ?: __('messages.cases_title'),
+        'subtitle' => localized_setting($pageHero, 'subtitle') ?: __('messages.cases_intro'),
+    ])
 
     <section class="bg-charcoal">
         <div class="mx-auto max-w-7xl px-4 py-16 lg:px-8">

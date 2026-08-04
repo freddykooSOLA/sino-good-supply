@@ -3,34 +3,103 @@
 @section('title', 'SINO GOOD')
 
 @section('content')
+    @php
+        $slides = collect($slides ?? [])->filter(fn ($slide) => is_array($slide))->values();
+        $hero = $hero ?? ['autoplay' => true, 'speed' => 5000];
+        $autoplay = ! empty($hero['autoplay']) && $slides->count() > 1;
+        $speed = max(2000, (int) ($hero['speed'] ?? 5000));
+    @endphp
+
     {{-- Hero --}}
-    <section class="relative min-h-screen overflow-hidden bg-primary-black">
-        @php $firstSlide = $slides[0] ?? null; @endphp
-        <div class="absolute inset-0">
-            @if(!empty($firstSlide['image']))
-                <img src="{{ public_storage_url($firstSlide['image']) }}" alt="" class="hero-slide h-full w-full object-cover opacity-55">
-            @else
-                <div class="h-full w-full bg-[radial-gradient(ellipse_at_top_right,_rgba(201,168,76,0.28),_transparent_55%),linear-gradient(160deg,#1a1a1a_0%,#2c2c2c_55%,#151515_100%)]"></div>
-            @endif
-            <div class="absolute inset-0 bg-gradient-to-t from-primary-black via-primary-black/55 to-primary-black/25"></div>
+    <section
+        class="relative min-h-screen overflow-hidden bg-primary-black"
+        @if($slides->count() > 1)
+            data-home-hero
+            data-autoplay="{{ $autoplay ? '1' : '0' }}"
+            data-speed="{{ $speed }}"
+        @endif
+    >
+        <div class="absolute inset-0" data-hero-slides>
+            @forelse($slides as $index => $slide)
+                <div
+                    class="hero-carousel-slide absolute inset-0 {{ $index === 0 ? 'is-active' : '' }}"
+                    data-hero-slide
+                    @if($index === 0) data-active="1" @endif
+                >
+                    @if(!empty($slide['image']))
+                        <img
+                            src="{{ public_storage_url($slide['image']) }}"
+                            alt=""
+                            class="h-full w-full object-cover opacity-55 {{ $autoplay ? 'hero-slide' : '' }}"
+                        >
+                    @else
+                        <div class="h-full w-full bg-[radial-gradient(ellipse_at_top_right,_rgba(201,168,76,0.28),_transparent_55%),linear-gradient(160deg,#1a1a1a_0%,#2c2c2c_55%,#151515_100%)]"></div>
+                    @endif
+                    <div class="absolute inset-0 bg-gradient-to-t from-primary-black via-primary-black/55 to-primary-black/25"></div>
+                </div>
+            @empty
+                <div class="absolute inset-0">
+                    <div class="h-full w-full bg-[radial-gradient(ellipse_at_top_right,_rgba(201,168,76,0.28),_transparent_55%),linear-gradient(160deg,#1a1a1a_0%,#2c2c2c_55%,#151515_100%)]"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-primary-black via-primary-black/55 to-primary-black/25"></div>
+                </div>
+            @endforelse
         </div>
 
         <div class="relative mx-auto flex min-h-screen max-w-7xl flex-col justify-end px-4 pb-20 pt-32 lg:px-8 lg:pb-28">
-            <div class="fade-up max-w-3xl">
-                <div class="mb-5 text-sm font-semibold tracking-[0.28em] text-gold-accent">SINO GOOD</div>
-                <h1 class="text-3xl font-semibold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
-                    {{ $firstSlide['title_en'] ?? 'SINO GOOD' }}
-                </h1>
-                <p class="mt-5 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg">
-                    {{ $firstSlide['subtitle_en'] ?? __('messages.tagline') }}
-                </p>
-                <div class="mt-8 flex flex-wrap gap-4">
-                    <a href="{{ $firstSlide['link'] ?? locale_url('products') }}" class="btn-gold">
-                        {{ $firstSlide['button_text_en'] ?? __('messages.explore') }}
-                    </a>
-                    <a href="{{ locale_url('contact') }}" class="btn-outline">{{ __('messages.contact_us') }}</a>
-                </div>
+            <div class="fade-up max-w-3xl" data-hero-copy>
+                @forelse($slides as $index => $slide)
+                    <div
+                        class="hero-carousel-copy {{ $index === 0 ? 'is-active' : '' }}"
+                        data-hero-copy-item
+                        @if($index !== 0) hidden @endif
+                    >
+                        <div class="mb-5 text-sm font-semibold tracking-[0.28em] text-gold-accent">SINO GOOD</div>
+                        <h1 class="text-3xl font-semibold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
+                            {{ $slide['title_en'] ?? 'SINO GOOD' }}
+                        </h1>
+                        <p class="mt-5 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg">
+                            {{ $slide['subtitle_en'] ?? __('messages.tagline') }}
+                        </p>
+                        <div class="mt-8 flex flex-wrap gap-4">
+                            <a href="{{ $slide['link'] ?? locale_url('products') }}" class="btn-gold">
+                                {{ $slide['button_text_en'] ?? __('messages.explore') }}
+                            </a>
+                            <a href="{{ locale_url('contact') }}" class="btn-outline">{{ __('messages.contact_us') }}</a>
+                        </div>
+                    </div>
+                @empty
+                    <div>
+                        <div class="mb-5 text-sm font-semibold tracking-[0.28em] text-gold-accent">SINO GOOD</div>
+                        <h1 class="text-3xl font-semibold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">SINO GOOD</h1>
+                        <p class="mt-5 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg">{{ __('messages.tagline') }}</p>
+                        <div class="mt-8 flex flex-wrap gap-4">
+                            <a href="{{ locale_url('products') }}" class="btn-gold">{{ __('messages.explore') }}</a>
+                            <a href="{{ locale_url('contact') }}" class="btn-outline">{{ __('messages.contact_us') }}</a>
+                        </div>
+                    </div>
+                @endforelse
             </div>
+
+            @if($slides->count() > 1)
+                <div class="mt-10 flex items-center gap-4">
+                    <button type="button" class="product-slider__nav !static !translate-y-0 !opacity-100" data-hero-prev aria-label="Previous slide">
+                        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M12.79 5.23a.75.75 0 01-.02 1.06L9.06 10l3.71 3.71a.75.75 0 11-1.06 1.06l-4.25-4.25a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.08.02z"/></svg>
+                    </button>
+                    <div class="flex gap-1.5" data-hero-dots>
+                        @foreach($slides as $index => $slide)
+                            <button
+                                type="button"
+                                class="product-slider__dot {{ $index === 0 ? 'is-active' : '' }}"
+                                data-hero-dot="{{ $index }}"
+                                aria-label="Slide {{ $index + 1 }}"
+                            ></button>
+                        @endforeach
+                    </div>
+                    <button type="button" class="product-slider__nav !static !translate-y-0 !opacity-100" data-hero-next aria-label="Next slide">
+                        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M7.21 14.77a.75.75 0 01.02-1.06L10.94 10 7.23 6.29a.75.75 0 111.06-1.06l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.08-.02z"/></svg>
+                    </button>
+                </div>
+            @endif
         </div>
     </section>
 

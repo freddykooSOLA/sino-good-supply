@@ -12,6 +12,7 @@ class HomeController extends Controller
     public function index(): View
     {
         $slides = Setting::getValue('hero_slides', []);
+        $hero = hero_settings();
         $stats = Setting::getValue('company_stats', []);
         $brands = Setting::getValue('brand_logos', []);
         $contact = Setting::getValue('contact', []);
@@ -31,6 +32,7 @@ class HomeController extends Controller
 
         return view('pages.home', compact(
             'slides',
+            'hero',
             'stats',
             'brands',
             'contact',

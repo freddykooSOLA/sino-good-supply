@@ -3,13 +3,20 @@
 @section('title', __('messages.contact_us'))
 
 @section('content')
-    <section class="bg-primary-black pt-28">
-        <div class="mx-auto max-w-7xl px-4 py-14 lg:px-8">
-            <div class="text-sm font-semibold tracking-[0.28em] text-gold-accent">SINO GOOD</div>
-            <h1 class="mt-4 text-4xl font-semibold tracking-tight text-white">{{ __('messages.get_in_touch') }}</h1>
-            <p class="mt-4 max-w-xl text-white/65">{{ __('messages.tagline') }}</p>
-        </div>
-    </section>
+    @php
+        $mediaType = $contact['media_type'] ?? 'none';
+        $mapSrc = $mediaType === 'map' ? google_maps_embed_src($contact['google_maps_embed'] ?? null) : null;
+        $mediaImage = ($mediaType === 'image' && ! empty($contact['media_image']))
+            ? public_storage_url($contact['media_image'])
+            : null;
+        $hasMedia = ($mediaType === 'image' && $mediaImage) || ($mediaType === 'map' && $mapSrc);
+    @endphp
+
+    @include('partials.page-hero', [
+        'image' => $pageHero['image'] ?? null,
+        'title' => localized_setting($pageHero, 'title') ?: __('messages.get_in_touch'),
+        'subtitle' => localized_setting($pageHero, 'subtitle') ?: __('messages.tagline'),
+    ])
 
     <section class="bg-charcoal">
         <div class="mx-auto grid max-w-7xl gap-12 px-4 py-16 lg:grid-cols-2 lg:px-8">
@@ -26,6 +33,27 @@
                         <p><a class="hover:text-gold-accent" href="mailto:{{ $contact['email'] }}">{{ $contact['email'] }}</a></p>
                     @endif
                 </div>
+
+                @if($hasMedia)
+                    <div class="mt-10 overflow-hidden bg-primary-black">
+                        @if($mediaType === 'map' && $mapSrc)
+                            <iframe
+                                src="{{ $mapSrc }}"
+                                class="aspect-[4/3] w-full border-0"
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"
+                                allowfullscreen
+                                title="Google Map"
+                            ></iframe>
+                        @elseif($mediaImage)
+                            <img
+                                src="{{ $mediaImage }}"
+                                alt=""
+                                class="aspect-[4/3] w-full object-cover"
+                            >
+                        @endif
+                    </div>
+                @endif
             </div>
 
             <div>

@@ -15,6 +15,8 @@ class CaseStudyController extends Controller
             ->orderByDesc('id')
             ->paginate(12);
 
-        return view('pages.cases', compact('cases'));
+        $pageHero = page_hero('cases');
+
+        return view('pages.cases', compact('cases', 'pageHero'));
     }
 }

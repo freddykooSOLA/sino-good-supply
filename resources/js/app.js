@@ -151,4 +151,73 @@ function initProductSliders(root = document) {
 
 document.addEventListener('DOMContentLoaded', () => {
     initProductSliders();
+    initHomeHero();
 });
+
+function initHomeHero() {
+    const root = document.querySelector('[data-home-hero]');
+    if (! root) {
+        return;
+    }
+
+    const slides = Array.from(root.querySelectorAll('[data-hero-slide]'));
+    const copies = Array.from(root.querySelectorAll('[data-hero-copy-item]'));
+    const dots = Array.from(root.querySelectorAll('[data-hero-dot]'));
+    const total = slides.length;
+
+    if (total < 2) {
+        return;
+    }
+
+    const autoplay = root.dataset.autoplay === '1';
+    const speed = Math.max(2000, Number(root.dataset.speed) || 5000);
+    let index = 0;
+    let timer = null;
+
+    const goTo = (nextIndex) => {
+        index = ((nextIndex % total) + total) % total;
+
+        slides.forEach((slide, i) => {
+            slide.classList.toggle('is-active', i === index);
+        });
+
+        copies.forEach((copy, i) => {
+            const active = i === index;
+            copy.classList.toggle('is-active', active);
+            copy.hidden = ! active;
+        });
+
+        dots.forEach((dot) => {
+            dot.classList.toggle('is-active', Number(dot.dataset.heroDot) === index);
+        });
+    };
+
+    const restart = () => {
+        if (! autoplay) {
+            return;
+        }
+
+        window.clearInterval(timer);
+        timer = window.setInterval(() => goTo(index + 1), speed);
+    };
+
+    root.querySelector('[data-hero-prev]')?.addEventListener('click', () => {
+        goTo(index - 1);
+        restart();
+    });
+
+    root.querySelector('[data-hero-next]')?.addEventListener('click', () => {
+        goTo(index + 1);
+        restart();
+    });
+
+    dots.forEach((dot) => {
+        dot.addEventListener('click', () => {
+            goTo(Number(dot.dataset.heroDot) || 0);
+            restart();
+        });
+    });
+
+    goTo(0);
+    restart();
+}

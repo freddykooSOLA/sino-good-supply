@@ -41,8 +41,9 @@ class ProductController extends Controller
         }
 
         $products = $query->paginate(12)->withQueryString();
+        $pageHero = page_hero('products');
 
-        return view('pages.products', compact('products', 'categories', 'activeCategory'));
+        return view('pages.products', compact('products', 'categories', 'activeCategory', 'pageHero'));
     }
 
     public function show(string $locale, string $slug): View
@@ -70,6 +71,8 @@ class ProductController extends Controller
             ->limit(4)
             ->get();
 
-        return view('pages.single-product', compact('product', 'related'));
+        $pageHero = page_hero('products');
+
+        return view('pages.single-product', compact('product', 'related', 'pageHero'));
     }
 }
