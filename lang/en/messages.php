@@ -3,8 +3,12 @@
 return [
     'nav_home' => 'Home',
     'nav_products' => 'Products',
+    'nav_cases' => 'Case Studies',
     'nav_about' => 'About',
     'nav_contact' => 'Contact',
+    'cases_title' => 'Case Studies',
+    'cases_intro' => 'Selected hotel and hospitality projects delivered with SINO GOOD supply solutions.',
+    'no_cases' => 'Case studies coming soon.',
     'tagline' => 'One-stop Building Materials Sourcing Partner for Europe\'s Finest Hotels',
     'view_details' => 'View Details',
     'all_products' => 'All Products',

@@ -39,6 +39,7 @@
                         @endforeach
                     </div>
                 </div>
+                <a href="{{ locale_url('cases') }}" class="nav-link">{{ __('messages.nav_cases') }}</a>
                 <a href="{{ locale_url('about') }}" class="nav-link">{{ __('messages.nav_about') }}</a>
                 <a href="{{ locale_url('contact') }}" class="nav-link">{{ __('messages.nav_contact') }}</a>
             </nav>
@@ -66,6 +67,7 @@
                 @foreach($categories as $category)
                     <a href="{{ locale_url('category/'.$category->localizedSlug()) }}" class="block py-1.5 pl-4 text-sm text-white/70">{{ $category->localizedName() }}</a>
                 @endforeach
+                <a href="{{ locale_url('cases') }}" class="block py-2 text-white/90">{{ __('messages.nav_cases') }}</a>
                 <a href="{{ locale_url('about') }}" class="block py-2 text-white/90">{{ __('messages.nav_about') }}</a>
                 <a href="{{ locale_url('contact') }}" class="block py-2 text-white/90">{{ __('messages.nav_contact') }}</a>
                 <div class="flex gap-3 pt-3 text-sm">

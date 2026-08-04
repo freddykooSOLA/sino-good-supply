@@ -3,8 +3,12 @@
 return [
     'nav_home' => '首页',
     'nav_products' => '产品',
+    'nav_cases' => '案例',
     'nav_about' => '关于我们',
     'nav_contact' => '联系我们',
+    'cases_title' => '项目案例',
+    'cases_intro' => '精选酒店与酒店项目案例，展示 SINO GOOD 供应链解决方案。',
+    'no_cases' => '案例即将上线。',
     'tagline' => '欧洲精品酒店一站式建材采购合作伙伴',
     'view_details' => '查看详情',
     'all_products' => '全部产品',
