@@ -19,6 +19,7 @@ class HomeController extends Controller
 
         $categories = Category::query()
             ->active()
+            ->with('previewProduct')
             ->orderBy('sort_order')
             ->get();
 

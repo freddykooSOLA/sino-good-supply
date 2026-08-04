@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Category extends Model
 {
@@ -29,6 +30,24 @@ class Category extends Model
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function previewProduct(): HasOne
+    {
+        return $this->hasOne(Product::class)->ofMany(
+            [
+                'sort_order' => 'min',
+                'id' => 'min',
+            ],
+            function ($query) {
+                $query->where('is_active', true);
+            }
+        );
+    }
+
+    public function previewImageUrl(): ?string
+    {
+        return $this->previewProduct?->thumbnailUrl();
     }
 
     public function localizedName(?string $locale = null): string

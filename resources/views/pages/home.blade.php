@@ -112,15 +112,27 @@
             </div>
             <div class="mt-12 grid gap-px bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach($categories as $index => $category)
+                    @php $previewImage = $category->previewImageUrl(); @endphp
                     <a href="{{ locale_url('category/'.$category->localizedSlug()) }}"
-                       class="group relative min-h-[220px] overflow-hidden bg-primary-black p-8 transition hover:bg-[#222]"
+                       class="group relative min-h-[260px] overflow-hidden bg-primary-black p-8 transition"
                        style="animation-delay: {{ $index * 0.08 }}s">
+                        @if($previewImage)
+                            <img
+                                src="{{ $previewImage }}"
+                                alt="{{ $category->localizedName() }}"
+                                class="absolute inset-0 h-full w-full object-cover opacity-45 transition duration-700 group-hover:scale-105 group-hover:opacity-55"
+                                loading="lazy"
+                            >
+                        @endif
+                        <div class="absolute inset-0 bg-gradient-to-t from-primary-black via-primary-black/55 to-primary-black/20"></div>
                         <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold-accent/60 to-transparent opacity-0 transition group-hover:opacity-100"></div>
-                        <div class="text-xs uppercase tracking-[0.2em] text-gold-accent/80">0{{ $index + 1 }}</div>
-                        <div class="mt-8 text-xl font-medium text-white transition group-hover:text-gold-accent">
-                            {{ $category->localizedName() }}
+                        <div class="relative z-10 flex h-full min-h-[196px] flex-col justify-end">
+                            <div class="text-xs uppercase tracking-[0.2em] text-gold-accent/80">0{{ $index + 1 }}</div>
+                            <div class="mt-4 text-xl font-medium text-white transition group-hover:text-gold-accent">
+                                {{ $category->localizedName() }}
+                            </div>
+                            <div class="mt-3 text-sm text-white/50 transition group-hover:text-white/70">{{ __('messages.view_details') }} →</div>
                         </div>
-                        <div class="mt-4 text-sm text-white/50 transition group-hover:text-white/70">{{ __('messages.view_details') }} →</div>
                     </a>
                 @endforeach
             </div>
