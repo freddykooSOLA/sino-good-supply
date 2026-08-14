@@ -31,7 +31,7 @@
                         <svg class="h-3.5 w-3.5 opacity-70" viewBox="0 0 20 20" fill="currentColor"><path d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/></svg>
                     </button>
                     <div class="invisible absolute left-0 top-full z-50 min-w-[240px] translate-y-2 bg-primary-black/95 opacity-0 shadow-xl backdrop-blur transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                        <a href="{{ locale_url('products') }}" class="block border-b border-white/10 px-4 py-3 text-sm text-gold-accent hover:bg-white/5">{{ __('messages.all_products') }}</a>
+                        <a href="{{ locale_url('products') }}" class="block border-b border-white/10 px-4 py-3 text-sm text-gold-accent hover:bg-white/5">{{ __('messages.all_series') }}</a>
                         @foreach($categories as $category)
                             <a href="{{ locale_url('category/'.$category->localizedSlug()) }}" class="block px-4 py-3 text-sm text-white/85 hover:bg-white/5 hover:text-gold-accent">
                                 {{ $category->localizedName() }}
@@ -40,6 +40,7 @@
                     </div>
                 </div>
                 <a href="{{ locale_url('cases') }}" class="nav-link">{{ __('messages.nav_cases') }}</a>
+                <a href="{{ locale_url('order-process') }}" class="nav-link">{{ __('messages.nav_order_process') }}</a>
                 <a href="{{ locale_url('about') }}" class="nav-link">{{ __('messages.nav_about') }}</a>
                 <a href="{{ locale_url('contact') }}" class="nav-link">{{ __('messages.nav_contact') }}</a>
             </nav>
@@ -68,6 +69,7 @@
                     <a href="{{ locale_url('category/'.$category->localizedSlug()) }}" class="block py-1.5 pl-4 text-sm text-white/70">{{ $category->localizedName() }}</a>
                 @endforeach
                 <a href="{{ locale_url('cases') }}" class="block py-2 text-white/90">{{ __('messages.nav_cases') }}</a>
+                <a href="{{ locale_url('order-process') }}" class="block py-2 text-white/90">{{ __('messages.nav_order_process') }}</a>
                 <a href="{{ locale_url('about') }}" class="block py-2 text-white/90">{{ __('messages.nav_about') }}</a>
                 <a href="{{ locale_url('contact') }}" class="block py-2 text-white/90">{{ __('messages.nav_contact') }}</a>
                 <div class="flex gap-3 pt-3 text-sm">

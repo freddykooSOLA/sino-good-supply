@@ -76,6 +76,19 @@ if (! function_exists('page_hero')) {
     }
 }
 
+if (! function_exists('homepage_heading')) {
+    function homepage_heading(string $key, string $fallbackTitle = '', string $fallbackSubtitle = ''): array
+    {
+        $all = once(fn () => Setting::getValue('homepage_headings', []) ?: []);
+        $item = is_array($all[$key] ?? null) ? $all[$key] : [];
+
+        return [
+            'title' => localized_setting($item, 'title') ?: $fallbackTitle,
+            'subtitle' => localized_setting($item, 'subtitle') ?: $fallbackSubtitle,
+        ];
+    }
+}
+
 if (! function_exists('hero_settings')) {
     function hero_settings(): array
     {

@@ -5,9 +5,11 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Support\TranslationForm;
 use App\Models\Product;
+use App\Models\Series;
 use App\Support\ImageCompressor;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -27,7 +29,7 @@ class ProductResource extends Resource
 
     protected static ?string $pluralModelLabel = '产品';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
@@ -38,7 +40,25 @@ class ProductResource extends Resource
                     ->relationship('category', 'name_zh')
                     ->searchable()
                     ->preload()
+                    ->live()
                     ->required(),
+                Forms\Components\Select::make('series_id')
+                    ->label('所属系列（可选）')
+                    ->options(function (Get $get) {
+                        $categoryId = $get('category_id');
+
+                        if (! $categoryId) {
+                            return [];
+                        }
+
+                        return Series::query()
+                            ->where('category_id', $categoryId)
+                            ->orderBy('sort_order')
+                            ->pluck('name_zh', 'id');
+                    })
+                    ->searchable()
+                    ->preload()
+                    ->nullable(),
                 TranslationForm::toolbar([
                     'name_en' => ['zh' => 'name_zh', 'zh_hant' => 'name_zh_hant', 'slug' => true],
                     'short_desc_en' => ['zh' => 'short_desc_zh', 'zh_hant' => 'short_desc_zh_hant'],

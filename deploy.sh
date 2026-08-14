@@ -23,6 +23,8 @@ ssh -i "$SSH_KEY" -o IdentitiesOnly=yes -p "$SSH_PORT" "${SSH_USER}@${SSH_HOST}"
   ${PHP_BIN} ${COMPOSER_PHAR} install --no-dev --optimize-autoloader --no-interaction
 
   ${PHP_BIN} artisan migrate --force
+  ${PHP_BIN} artisan db:seed --class=WatermarkSettingsSeeder --force
+  ${PHP_BIN} artisan db:seed --class=HomepageContentSeeder --force
   ${PHP_BIN} artisan storage:link || true
   ${PHP_BIN} artisan config:cache
   ${PHP_BIN} artisan route:cache

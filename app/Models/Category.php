@@ -32,6 +32,11 @@ class Category extends Model
         return $this->hasMany(Product::class);
     }
 
+    public function series(): HasMany
+    {
+        return $this->hasMany(Series::class);
+    }
+
     public function previewProduct(): HasOne
     {
         return $this->hasOne(Product::class)->ofMany(
@@ -45,9 +50,23 @@ class Category extends Model
         );
     }
 
+    public function previewSeries(): HasOne
+    {
+        return $this->hasOne(Series::class)->ofMany(
+            [
+                'sort_order' => 'min',
+                'id' => 'min',
+            ],
+            function ($query) {
+                $query->where('is_active', true);
+            }
+        );
+    }
+
     public function previewImageUrl(): ?string
     {
-        return $this->previewProduct?->thumbnailUrl();
+        return $this->previewSeries?->thumbnailUrl()
+            ?? $this->previewProduct?->thumbnailUrl();
     }
 
     public function localizedName(?string $locale = null): string

@@ -16,8 +16,18 @@ class PageController extends Controller
         $stats = Setting::getValue('company_stats', []);
         $contact = Setting::getValue('contact', []);
         $pageHero = page_hero('about');
+        $aboutContent = Setting::getValue('about_content', []) ?: [];
+        $advantages = Setting::getValue('advantages', []) ?: [];
 
-        return view('pages.about', compact('stats', 'contact', 'pageHero'));
+        return view('pages.about', compact('stats', 'contact', 'pageHero', 'aboutContent', 'advantages'));
+    }
+
+    public function orderProcess(): View
+    {
+        $orderProcess = Setting::getValue('order_process', []) ?: [];
+        $pageHero = page_hero('order_process');
+
+        return view('pages.order-process', compact('orderProcess', 'pageHero'));
     }
 
     public function contact(): View

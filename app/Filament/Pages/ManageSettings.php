@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Support\HomepageForm;
 use App\Models\Setting;
 use Filament\Actions\Action;
 use Filament\Forms;
@@ -33,6 +34,7 @@ class ManageSettings extends Page
             'cases' => [],
             'about' => [],
             'contact' => [],
+            'order_process' => [],
         ];
 
         $this->form->fill([
@@ -52,6 +54,18 @@ class ManageSettings extends Page
                 'google_maps_embed' => '',
             ], Setting::getValue('contact', []) ?: []),
             'brand_logos' => Setting::getValue('brand_logos', []) ?: [],
+            'homepage_headings' => Setting::getValue('homepage_headings', []) ?: [],
+            'core_business' => Setting::getValue('core_business', []) ?: [],
+            'featured_cases' => Setting::getValue('featured_cases', []) ?: [],
+            'order_process' => array_merge([
+                'flowchart_image' => null,
+                'steps' => [],
+            ], Setting::getValue('order_process', []) ?: []),
+            'advantages' => Setting::getValue('advantages', []) ?: [],
+            'visible_category_ids' => Setting::getValue('visible_category_ids', []) ?: [],
+            'facebook_posts' => Setting::getValue('facebook_posts', []) ?: [],
+            'latest_news' => Setting::getValue('latest_news', []) ?: [],
+            'about_content' => Setting::getValue('about_content', []) ?: [],
         ]);
     }
 
@@ -86,37 +100,21 @@ class ManageSettings extends Page
                                     ->statePath('hero'),
                                 Forms\Components\Repeater::make('hero_slides')
                                     ->label('轮播幻灯片')
-                                    ->schema([
-                                        Forms\Components\FileUpload::make('image')
-                                            ->label('图片')
-                                            ->image()
-                                            ->directory('banners')
-                                            ->disk('public')
-                                            ->visibility('public'),
-                                        Forms\Components\TextInput::make('title_en')
-                                            ->label('英文标题'),
-                                        Forms\Components\TextInput::make('subtitle_en')
-                                            ->label('英文副标题'),
-                                        Forms\Components\TextInput::make('button_text_en')
-                                            ->label('按钮文字'),
-                                        Forms\Components\TextInput::make('link')
-                                            ->label('跳转链接')
-                                            ->helperText('可留空；填写时请用完整网址，例如 https://...')
-                                            ->rule('nullable')
-                                            ->dehydrateStateUsing(fn (?string $state): ?string => filled($state) ? $state : null),
-                                    ])
+                                    ->schema(HomepageForm::heroSlideSchema())
                                     ->defaultItems(0)
                                     ->reorderable()
                                     ->collapsible()
-                                    ->itemLabel(fn (array $state): ?string => $state['title_en'] ?? '新幻灯片')
+                                    ->itemLabel(fn (array $state): ?string => $state['title_en'] ?? $state['title_zh'] ?? '新幻灯片')
                                     ->columnSpanFull(),
                             ]),
+                        ...HomepageForm::tabs(),
                         Forms\Components\Tabs\Tab::make('页面头图')
                             ->schema([
-                                $this->pageHeroSection('产品页', 'products'),
+                                $this->pageHeroSection('系列 / 分类页', 'products'),
                                 $this->pageHeroSection('案例页', 'cases'),
                                 $this->pageHeroSection('关于我们', 'about'),
                                 $this->pageHeroSection('联系我们', 'contact'),
+                                $this->pageHeroSection('落单流程', 'order_process'),
                             ]),
                         Forms\Components\Tabs\Tab::make('公司数据')
                             ->schema([
@@ -275,6 +273,15 @@ class ManageSettings extends Page
             Setting::setValue('company_stats', $state['company_stats'] ?? []);
             Setting::setValue('contact', $state['contact'] ?? []);
             Setting::setValue('brand_logos', $state['brand_logos'] ?? []);
+            Setting::setValue('homepage_headings', $state['homepage_headings'] ?? []);
+            Setting::setValue('core_business', $state['core_business'] ?? []);
+            Setting::setValue('featured_cases', $state['featured_cases'] ?? []);
+            Setting::setValue('order_process', $state['order_process'] ?? []);
+            Setting::setValue('advantages', $state['advantages'] ?? []);
+            Setting::setValue('visible_category_ids', array_values($state['visible_category_ids'] ?? []));
+            Setting::setValue('facebook_posts', array_slice($state['facebook_posts'] ?? [], 0, 3));
+            Setting::setValue('latest_news', $state['latest_news'] ?? []);
+            Setting::setValue('about_content', $state['about_content'] ?? []);
 
             Notification::make()
                 ->title('设置已保存')

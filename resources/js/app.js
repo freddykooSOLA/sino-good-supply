@@ -152,6 +152,7 @@ function initProductSliders(root = document) {
 document.addEventListener('DOMContentLoaded', () => {
     initProductSliders();
     initHomeHero();
+    initPdfPreview();
 });
 
 function initHomeHero() {
@@ -220,4 +221,137 @@ function initHomeHero() {
 
     goTo(0);
     restart();
+}
+
+function initPdfPreview() {
+    const root = document.querySelector('[data-pdf-preview]');
+    if (! root) {
+        return;
+    }
+
+    const url = root.dataset.pdfUrl;
+    const stage = root.querySelector('[data-pdf-stage]');
+    if (! url || ! stage) {
+        return;
+    }
+
+    const watermark = (() => {
+        try {
+            return JSON.parse(root.dataset.watermark || '{}');
+        } catch {
+            return {};
+        }
+    })();
+
+    const blockEvent = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        return false;
+    };
+
+    root.addEventListener('contextmenu', blockEvent);
+    root.addEventListener('dragstart', blockEvent);
+    root.addEventListener('copy', blockEvent);
+
+    const onKeyDown = (event) => {
+        const key = event.key.toLowerCase();
+        if ((event.ctrlKey || event.metaKey) && ['s', 'p', 'c', 'u', 'o'].includes(key)) {
+            event.preventDefault();
+        }
+        if (key === 'f12' || (event.ctrlKey && event.shiftKey && ['i', 'j', 'c'].includes(key))) {
+            event.preventDefault();
+        }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+
+    const loadPdfJs = async () => {
+        const pdfjs = await import(/* @vite-ignore */ 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.min.mjs');
+        pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.mjs';
+        return pdfjs;
+    };
+
+    const loadWatermarkImage = () => new Promise((resolve) => {
+        if (! watermark.image) {
+            resolve(null);
+            return;
+        }
+
+        const image = new Image();
+        image.crossOrigin = 'anonymous';
+        image.onload = () => resolve(image);
+        image.onerror = () => resolve(null);
+        image.src = watermark.image;
+    });
+
+    const stampCanvas = (canvas, image) => {
+        const ctx = canvas.getContext('2d');
+        if (! ctx) {
+            return;
+        }
+
+        const opacity = Number(watermark.opacity ?? 0.18);
+        const size = Math.max(24, Number(watermark.size ?? 140));
+        const spacing = Math.max(20, Number(watermark.spacing ?? 90));
+        const pattern = watermark.pattern === 'centered' ? 'centered' : 'tiled';
+
+        ctx.save();
+        ctx.globalAlpha = opacity;
+
+        const drawOne = (x, y, stampSize) => {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(-Math.PI / 4);
+
+            if (image) {
+                const ratio = image.width / Math.max(image.height, 1);
+                const w = stampSize;
+                const h = stampSize / ratio;
+                ctx.drawImage(image, -w / 2, -h / 2, w, h);
+            } else {
+                ctx.font = `700 ${Math.max(18, stampSize * 0.28)}px Inter, sans-serif`;
+                ctx.fillStyle = '#c9a84c';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(watermark.text || 'SINO GOOD', 0, 0);
+            }
+
+            ctx.restore();
+        };
+
+        if (pattern === 'centered') {
+            drawOne(canvas.width / 2, canvas.height / 2, size * 1.6);
+        } else {
+            for (let y = 0; y < canvas.height + size; y += size + spacing) {
+                for (let x = 0; x < canvas.width + size; x += size + spacing) {
+                    drawOne(x, y, size);
+                }
+            }
+        }
+
+        ctx.restore();
+    };
+
+    (async () => {
+        try {
+            const [pdfjs, watermarkImage] = await Promise.all([loadPdfJs(), loadWatermarkImage()]);
+            const pdf = await pdfjs.getDocument({ url, withCredentials: true }).promise;
+            stage.innerHTML = '';
+
+            for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+                const page = await pdf.getPage(pageNumber);
+                const viewport = page.getViewport({ scale: 1.35 });
+                const canvas = document.createElement('canvas');
+                canvas.className = 'pdf-protect__page';
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+                stampCanvas(canvas, watermarkImage);
+                stage.appendChild(canvas);
+            }
+        } catch (error) {
+            console.error(error);
+            stage.innerHTML = `<iframe class="h-[80vh] w-full border-0" src="${url}#toolbar=0&navpanes=0&scrollbar=0" title="PDF preview"></iframe>`;
+        }
+    })();
 }

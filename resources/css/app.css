@@ -133,3 +133,20 @@
 .product-slider__thumb.is-active {
     @apply border-gold-accent opacity-100;
 }
+
+.pdf-protect {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.pdf-protect__toolbar {
+    @apply border-b border-white/10 bg-primary-black px-4 py-3 text-xs uppercase tracking-wider text-gold-accent/90;
+}
+
+.pdf-protect__stage {
+    @apply max-h-[80vh] overflow-auto bg-[#1a1a1a];
+}
+
+.pdf-protect__page {
+    @apply mx-auto my-4 block max-w-full shadow-lg;
+}

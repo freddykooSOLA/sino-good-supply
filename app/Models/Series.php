@@ -4,39 +4,34 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
-class Product extends Model
+class Series extends Model
 {
+    protected $table = 'series';
+
     protected $fillable = [
         'category_id',
-        'series_id',
         'name_en',
         'name_zh',
         'name_zh_hant',
         'slug_en',
         'slug_zh',
         'slug_zh_hant',
-        'short_desc_en',
-        'short_desc_zh',
-        'short_desc_zh_hant',
-        'full_desc_en',
-        'full_desc_zh',
-        'full_desc_zh_hant',
-        'specs',
+        'intro_en',
+        'intro_zh',
+        'intro_zh_hant',
         'images',
         'pdf_path',
-        'sort_order',
-        'is_featured',
         'is_active',
+        'sort_order',
     ];
 
     protected function casts(): array
     {
         return [
-            'specs' => 'array',
             'images' => 'array',
-            'is_featured' => 'boolean',
             'is_active' => 'boolean',
             'sort_order' => 'integer',
         ];
@@ -47,9 +42,9 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function series(): BelongsTo
+    public function products(): HasMany
     {
-        return $this->belongsTo(Series::class);
+        return $this->hasMany(Product::class);
     }
 
     public function localizedName(?string $locale = null): string
@@ -74,25 +69,14 @@ class Product extends Model
         };
     }
 
-    public function localizedShortDesc(?string $locale = null): ?string
+    public function localizedIntro(?string $locale = null): ?string
     {
         $locale = $locale ?? app()->getLocale();
 
         return match ($locale) {
-            'zh' => $this->short_desc_zh ?: $this->short_desc_en,
-            'zh-hant' => $this->short_desc_zh_hant ?: $this->short_desc_en,
-            default => $this->short_desc_en,
-        };
-    }
-
-    public function localizedFullDesc(?string $locale = null): ?string
-    {
-        $locale = $locale ?? app()->getLocale();
-
-        return match ($locale) {
-            'zh' => $this->full_desc_zh ?: $this->full_desc_en,
-            'zh-hant' => $this->full_desc_zh_hant ?: $this->full_desc_en,
-            default => $this->full_desc_en,
+            'zh' => $this->intro_zh ?: $this->intro_en,
+            'zh-hant' => $this->intro_zh_hant ?: $this->intro_en,
+            default => $this->intro_en,
         };
     }
 
@@ -116,13 +100,18 @@ class Product extends Model
             ->all();
     }
 
-    public function pdfUrl(): ?string
+    public function hasPdf(): bool
     {
-        if (! $this->pdf_path) {
+        return filled($this->pdf_path) && Storage::disk('local')->exists($this->pdf_path);
+    }
+
+    public function pdfAbsolutePath(): ?string
+    {
+        if (! $this->hasPdf()) {
             return null;
         }
 
-        return Storage::disk('public')->url($this->pdf_path);
+        return Storage::disk('local')->path($this->pdf_path);
     }
 
     public function scopeActive($query)
@@ -130,20 +119,12 @@ class Product extends Model
         return $query->where('is_active', true);
     }
 
-    public function scopeFeatured($query)
+    public function scopeFindByAnySlug($query, string $slug)
     {
-        return $query->where('is_featured', true);
-    }
-
-    public function scopeFindByLocalizedSlug($query, string $slug, ?string $locale = null)
-    {
-        $locale = $locale ?? app()->getLocale();
-        $column = match ($locale) {
-            'zh' => 'slug_zh',
-            'zh-hant' => 'slug_zh_hant',
-            default => 'slug_en',
-        };
-
-        return $query->where($column, $slug);
+        return $query->where(function ($q) use ($slug) {
+            $q->where('slug_en', $slug)
+                ->orWhere('slug_zh', $slug)
+                ->orWhere('slug_zh_hant', $slug);
+        });
     }
 }
