@@ -29,9 +29,17 @@
                     @if(!empty($contact['phone']))
                         <p><a class="hover:text-gold-accent" href="tel:{{ $contact['phone'] }}">{{ $contact['phone'] }}</a></p>
                     @endif
+                    @if(!empty($contact['whatsapp']) && whatsapp_url($contact['whatsapp']))
+                        <p>
+                            <a class="hover:text-gold-accent" href="{{ whatsapp_url($contact['whatsapp']) }}" target="_blank" rel="noopener">
+                                {{ __('messages.whatsapp') }}: {{ $contact['whatsapp'] }}
+                            </a>
+                        </p>
+                    @endif
                     @if(!empty($contact['email']))
                         <p><a class="hover:text-gold-accent" href="mailto:{{ $contact['email'] }}">{{ $contact['email'] }}</a></p>
                     @endif
+                    @include('partials.social-links', ['contact' => $contact])
                 </div>
 
                 @if($hasMedia)

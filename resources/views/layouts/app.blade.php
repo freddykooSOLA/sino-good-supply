@@ -102,9 +102,17 @@
                     @if(!empty($contact['phone']))
                         <p><a href="tel:{{ $contact['phone'] }}" class="hover:text-gold-accent">{{ $contact['phone'] }}</a></p>
                     @endif
+                    @if(!empty($contact['whatsapp']) && whatsapp_url($contact['whatsapp']))
+                        <p>
+                            <a href="{{ whatsapp_url($contact['whatsapp']) }}" class="hover:text-gold-accent" target="_blank" rel="noopener">
+                                {{ __('messages.whatsapp') }}: {{ $contact['whatsapp'] }}
+                            </a>
+                        </p>
+                    @endif
                     @if(!empty($contact['email']))
                         <p><a href="mailto:{{ $contact['email'] }}" class="hover:text-gold-accent">{{ $contact['email'] }}</a></p>
                     @endif
+                    @include('partials.social-links', ['contact' => $contact])
                 </div>
             </div>
             <div>
@@ -117,7 +125,7 @@
             </div>
         </div>
         <div class="border-t border-white/10 py-5 text-center text-xs text-white/40">
-            &copy; {{ date('Y') }} SINO GOOD QY Supply Chain CO LTD
+            &copy; {{ date('Y') }} {{ localized_setting($contact, 'company') ?: 'SINO GOOD QY SUPPLY CHAIN CO., LTD' }}
         </div>
     </footer>
 

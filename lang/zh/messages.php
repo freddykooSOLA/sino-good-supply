@@ -58,5 +58,7 @@ return [
     'breadcrumb_home' => '首页',
     'get_in_touch' => '取得联系',
     'explore' => '了解更多',
-    'company_footer' => 'SINO GOOD 启扬供应链有限公司',
+    'company_footer' => '佛山兰悦君华贸易有限公司',
+    'whatsapp' => 'WhatsApp',
+    'follow_us' => '关注我们',
 ];

@@ -42,6 +42,21 @@ if (! function_exists('switch_locale_url')) {
     }
 }
 
+if (! function_exists('media_url')) {
+    function media_url(?string $path): ?string
+    {
+        if (! $path) {
+            return null;
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        return public_storage_url($path);
+    }
+}
+
 if (! function_exists('public_storage_url')) {
     function public_storage_url(?string $path): ?string
     {
@@ -64,6 +79,19 @@ if (! function_exists('site_contact')) {
     function site_contact(): array
     {
         return once(fn () => Setting::getValue('contact', []) ?: []);
+    }
+}
+
+if (! function_exists('whatsapp_url')) {
+    function whatsapp_url(?string $number): ?string
+    {
+        if (blank($number)) {
+            return null;
+        }
+
+        $digits = preg_replace('/\D+/', '', $number);
+
+        return filled($digits) ? 'https://wa.me/'.$digits : null;
     }
 }
 

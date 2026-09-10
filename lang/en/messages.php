@@ -58,5 +58,7 @@ return [
     'breadcrumb_home' => 'Home',
     'get_in_touch' => 'Get in Touch',
     'explore' => 'Explore',
-    'company_footer' => 'SINO GOOD QY Supply Chain CO LTD',
+    'company_footer' => 'SINO GOOD QY SUPPLY CHAIN CO., LTD',
+    'whatsapp' => 'WhatsApp',
+    'follow_us' => 'Follow us',
 ];
