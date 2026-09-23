@@ -185,6 +185,11 @@ class ProductResource extends Resource
                         );
                     })
                     ->columnSpanFull(),
+                Forms\Components\Toggle::make('watermark_images')
+                    ->label('产品相片加浮水印')
+                    ->helperText('开启后前台相片套用后台浮水印设置；关闭则显示原图。')
+                    ->default(true)
+                    ->inline(false),
                 Forms\Components\FileUpload::make('pdf_path')
                     ->label('产品PDF目录')
                     ->acceptedFileTypes(['application/pdf'])

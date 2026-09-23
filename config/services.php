@@ -35,6 +35,14 @@ return [
         ],
     ],
 
+    'facebook' => [
+        'page_url' => env('FACEBOOK_PAGE_URL'),
+        'access_token' => env('FACEBOOK_ACCESS_TOKEN'),
+        'app_id' => env('FACEBOOK_APP_ID'),
+        'app_secret' => env('FACEBOOK_APP_SECRET'),
+        'graph_version' => env('FACEBOOK_GRAPH_VERSION', 'v21.0'),
+    ],
+
     'translation' => [
         // Kept for compatibility; current driver uses Google GTX (no API key / no account quota).
         'email' => env('TRANSLATION_EMAIL'),

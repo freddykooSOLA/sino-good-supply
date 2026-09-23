@@ -4,7 +4,10 @@ namespace App\Filament\Support;
 
 use App\Models\CaseStudy;
 use App\Models\Category;
+use App\Models\Setting;
+use App\Support\ImageCompressor;
 use Filament\Forms;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class HomepageForm
 {
@@ -126,8 +129,52 @@ class HomepageForm
             Forms\Components\Tabs\Tab::make('Facebook')
                 ->schema([
                     static::headingFields('facebook_posts'),
+                    Forms\Components\Section::make('自动读取主页帖子')
+                        ->description('填写 Facebook 专页 ID 或专页链接，保存后首页会横列显示最新 3 则帖子。Facebook 规定读取帖子需要一次 Page Access Token（之后可留空）。')
+                        ->schema([
+                            Forms\Components\Toggle::make('enabled')
+                                ->label('启用 Facebook 区块')
+                                ->default(true)
+                                ->inline(false),
+                            Forms\Components\TextInput::make('page_url')
+                                ->label('Facebook 专页 ID 或链接')
+                                ->placeholder('例如 123456789 或 https://www.facebook.com/yourpage')
+                                ->helperText('可只填专页数字 ID、专页用户名或完整链接。')
+                                ->columnSpanFull(),
+                            Forms\Components\TextInput::make('access_token')
+                                ->label('Page Access Token（首次需要）')
+                                ->password()
+                                ->revealable()
+                                ->helperText(function (): string {
+                                    $saved = filled(Setting::getValue('facebook_connection', [])['access_token'] ?? null)
+                                        || filled(config('services.facebook.access_token'));
+
+                                    $hint = '打开 Graph API Explorer，选该专页，勾选 pages_read_engagement / pages_show_list，点 Generate Access Token，把 Token 贴到这里。保存后首页会自动横列最新 3 则帖子。';
+
+                                    return $saved
+                                        ? '已保存读取密钥，可留空。'.$hint
+                                        : $hint;
+                                })
+                                ->dehydrated(fn (?string $state): bool => filled($state))
+                                ->columnSpanFull(),
+                            Forms\Components\Placeholder::make('page_id_display')
+                                ->label('已识别主页 ID')
+                                ->content(fn (): string => (string) (Setting::getValue('facebook_connection', [])['page_id'] ?? '尚未同步')),
+                            Forms\Components\Placeholder::make('last_synced_display')
+                                ->label('上次同步')
+                                ->content(function (): string {
+                                    $connection = Setting::getValue('facebook_connection', []) ?: [];
+                                    $synced = $connection['last_synced_at'] ?? null;
+                                    $error = $connection['last_error'] ?? null;
+                                    $time = $synced ? \Illuminate\Support\Carbon::parse($synced)->timezone(config('app.timezone'))->toDateTimeString() : '尚未同步';
+
+                                    return $error ? $time.'（最近错误：'.$error.'）' : $time;
+                                }),
+                        ])
+                        ->columns(2)
+                        ->statePath('facebook_connection'),
                     Forms\Components\Repeater::make('facebook_posts')
-                        ->label('最新帖子')
+                        ->label('手动备用帖子（仅在自动同步失败或未配置时使用）')
                         ->schema([
                             Forms\Components\FileUpload::make('image')
                                 ->label('图片')
@@ -138,14 +185,14 @@ class HomepageForm
                             ...static::textareas('text', '文字'),
                             Forms\Components\TextInput::make('link')
                                 ->label('帖子链接')
-                                ->url()
-                                ->required(),
+                                ->url(),
                         ])
                         ->maxItems(3)
                         ->defaultItems(0)
                         ->reorderable()
                         ->collapsible()
-                        ->itemLabel(fn (array $state): ?string => \Illuminate\Support\Str::limit($state['text_en'] ?? $state['text_zh'] ?? '新帖子', 24))
+                        ->collapsed()
+                        ->itemLabel(fn (array $state): ?string => \Illuminate\Support\Str::limit($state['text_en'] ?? $state['text_zh'] ?? '备用帖子', 24))
                         ->columnSpanFull(),
                 ]),
             Forms\Components\Tabs\Tab::make('最新动向')
@@ -154,10 +201,36 @@ class HomepageForm
                     Forms\Components\Repeater::make('latest_news')
                         ->label('新闻 / 动向')
                         ->schema([
+                            TranslationForm::toolbar([
+                                'title_en' => ['zh' => 'title_zh', 'zh_hant' => 'title_zh_hant'],
+                                'excerpt_en' => ['zh' => 'excerpt_zh', 'zh_hant' => 'excerpt_zh_hant'],
+                            ]),
                             Forms\Components\DatePicker::make('date')
                                 ->label('日期'),
                             ...static::textInputs('title', '标题', required: true),
                             ...static::textareas('excerpt', '摘要'),
+                            Forms\Components\FileUpload::make('images')
+                                ->label('图片（0–5 张，前台轮播）')
+                                ->helperText('可不上传。上传后首页以幻灯片展示。')
+                                ->image()
+                                ->multiple()
+                                ->reorderable()
+                                ->maxFiles(5)
+                                ->maxSize(10240)
+                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+                                ->directory('homepage/news')
+                                ->disk('public')
+                                ->visibility('public')
+                                ->imageEditor()
+                                ->saveUploadedFileUsing(function (TemporaryUploadedFile $file): string {
+                                    return ImageCompressor::storeUnderLimit(
+                                        file: $file,
+                                        directory: 'homepage/news',
+                                        maxKilobytes: 200,
+                                        disk: 'public',
+                                        maxDimension: 1600,
+                                    );
+                                }),
                             Forms\Components\TextInput::make('link')
                                 ->label('链接'),
                         ])

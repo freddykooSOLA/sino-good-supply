@@ -293,13 +293,13 @@
                 @if($fbHeading['subtitle'])
                     <p class="section-sub">{{ $fbHeading['subtitle'] }}</p>
                 @endif
-                <div class="mt-12 grid gap-8 md:grid-cols-3">
+                <div class="mt-12 grid gap-6 md:grid-cols-3">
                     @foreach($facebookPosts as $post)
-                        <a href="{{ $post['link'] ?? '#' }}" target="_blank" rel="noopener" class="group block border border-white/10 bg-charcoal transition hover:border-gold-accent/50">
+                        <a href="{{ $post['link'] ?? '#' }}" target="_blank" rel="noopener" class="group flex flex-col border border-white/10 bg-charcoal transition hover:border-gold-accent/50">
                             @if(!empty($post['image']))
-                                <img src="{{ public_storage_url($post['image']) }}" alt="" class="aspect-[4/3] w-full object-cover">
+                                <img src="{{ media_url($post['image']) }}" alt="" class="aspect-[4/3] w-full object-cover">
                             @endif
-                            <div class="p-6">
+                            <div class="flex flex-1 flex-col p-6">
                                 <p class="text-sm leading-relaxed text-white/70">{{ localized_setting($post, 'text') }}</p>
                                 <span class="mt-4 inline-block text-sm text-gold-accent">Facebook →</span>
                             </div>
@@ -320,17 +320,53 @@
                 @endif
                 <div class="mt-12 divide-y divide-white/10 border-y border-white/10">
                     @foreach($latestNews as $news)
-                        <article class="py-8">
-                            @if(!empty($news['date']))
-                                <div class="text-xs tracking-wider text-gold-accent/80">{{ $news['date'] }}</div>
+                        @php
+                            $newsImages = collect($news['images'] ?? [])
+                                ->map(fn ($path) => media_url(is_array($path) ? ($path[0] ?? null) : $path))
+                                ->filter()
+                                ->values();
+                            $newsHasSlider = $newsImages->count() > 1;
+                        @endphp
+                        <article class="grid gap-8 py-8 {{ $newsImages->isNotEmpty() ? 'md:grid-cols-2' : '' }}">
+                            @if($newsImages->isNotEmpty())
+                                <div
+                                    class="product-slider relative aspect-[4/3] overflow-hidden bg-primary-black"
+                                    @if($newsHasSlider) data-product-slider @endif
+                                >
+                                    <div class="product-slider__track flex h-full transition-transform duration-300 ease-out" data-slider-track>
+                                        @foreach($newsImages as $index => $image)
+                                            <div class="h-full w-full shrink-0">
+                                                <img src="{{ $image }}" alt="{{ localized_setting($news, 'title') }}" class="h-full w-full object-cover" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" draggable="false">
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    @if($newsHasSlider)
+                                        <button type="button" class="product-slider__nav left-3" data-slider-prev aria-label="Previous image">
+                                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M12.79 5.23a.75.75 0 01-.02 1.06L9.06 10l3.71 3.71a.75.75 0 11-1.06 1.06l-4.25-4.25a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.08.02z"/></svg>
+                                        </button>
+                                        <button type="button" class="product-slider__nav right-3" data-slider-next aria-label="Next image">
+                                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M7.21 14.77a.75.75 0 01.02-1.06L10.94 10 7.23 6.29a.75.75 0 111.06-1.06l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.08-.02z"/></svg>
+                                        </button>
+                                        <div class="absolute bottom-3 left-0 right-0 z-10 flex justify-center gap-1.5" data-slider-dots>
+                                            @foreach($newsImages as $index => $image)
+                                                <button type="button" class="product-slider__dot {{ $index === 0 ? 'is-active' : '' }}" data-slider-dot="{{ $index }}" aria-label="Image {{ $index + 1 }}"></button>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
                             @endif
-                            <h3 class="mt-2 text-xl font-medium text-white">{{ localized_setting($news, 'title') }}</h3>
-                            @if(localized_setting($news, 'excerpt'))
-                                <p class="mt-3 max-w-3xl text-sm leading-relaxed text-white/60">{{ localized_setting($news, 'excerpt') }}</p>
-                            @endif
-                            @if(!empty($news['link']))
-                                <a href="{{ $news['link'] }}" class="mt-4 inline-block text-sm text-gold-accent">{{ __('messages.view_details') }} →</a>
-                            @endif
+                            <div>
+                                @if(!empty($news['date']))
+                                    <div class="text-xs tracking-wider text-gold-accent/80">{{ $news['date'] }}</div>
+                                @endif
+                                <h3 class="mt-2 text-xl font-medium text-white">{{ localized_setting($news, 'title') }}</h3>
+                                @if(localized_setting($news, 'excerpt'))
+                                    <p class="mt-3 max-w-3xl text-sm leading-relaxed text-white/60">{{ localized_setting($news, 'excerpt') }}</p>
+                                @endif
+                                @if(!empty($news['link']))
+                                    <a href="{{ $news['link'] }}" class="mt-4 inline-block text-sm text-gold-accent">{{ __('messages.view_details') }} →</a>
+                                @endif
+                            </div>
                         </article>
                     @endforeach
                 </div>

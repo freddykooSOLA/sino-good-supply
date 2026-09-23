@@ -22,19 +22,19 @@ function Test-Url {
 }
 
 $checks = @(
-    @{ u = 'https://freddyk9.sg-host.com/en'; m = @('SINO GOOD','Hotel Supplies') },
-    @{ u = 'https://freddyk9.sg-host.com/zh'; m = @('SINO GOOD','酒店用品','案例') },
-    @{ u = 'https://freddyk9.sg-host.com/zh-hant'; m = @('SINO GOOD','案例') },
-    @{ u = 'https://freddyk9.sg-host.com/en/products'; m = @('All Products','SINO GOOD') },
-    @{ u = 'https://freddyk9.sg-host.com/zh/products'; m = @('全部产品','SINO GOOD') },
-    @{ u = 'https://freddyk9.sg-host.com/en/cases'; m = @('Case Studies','SINO GOOD') },
-    @{ u = 'https://freddyk9.sg-host.com/zh/cases'; m = @('项目案例','SINO GOOD') },
-    @{ u = 'https://freddyk9.sg-host.com/zh-hant/cases'; m = @('項目案例','SINO GOOD') },
-    @{ u = 'https://freddyk9.sg-host.com/en/about'; m = @('About SINO GOOD') },
-    @{ u = 'https://freddyk9.sg-host.com/zh/about'; m = @('关于 SINO GOOD') },
-    @{ u = 'https://freddyk9.sg-host.com/en/contact'; m = @('_token','Send Message') },
-    @{ u = 'https://freddyk9.sg-host.com/zh/contact'; m = @('_token','发送留言') },
-    @{ u = 'https://freddyk9.sg-host.com/admin/login'; m = @('email','password') }
+    @{ u = 'https://sino-good.com/en'; m = @('SINO GOOD','Hotel Supplies') },
+    @{ u = 'https://sino-good.com/zh'; m = @('SINO GOOD','酒店用品','案例') },
+    @{ u = 'https://sino-good.com/zh-hant'; m = @('SINO GOOD','案例') },
+    @{ u = 'https://sino-good.com/en/products'; m = @('All Products','SINO GOOD') },
+    @{ u = 'https://sino-good.com/zh/products'; m = @('全部产品','SINO GOOD') },
+    @{ u = 'https://sino-good.com/en/cases'; m = @('Case Studies','SINO GOOD') },
+    @{ u = 'https://sino-good.com/zh/cases'; m = @('项目案例','SINO GOOD') },
+    @{ u = 'https://sino-good.com/zh-hant/cases'; m = @('項目案例','SINO GOOD') },
+    @{ u = 'https://sino-good.com/en/about'; m = @('About SINO GOOD') },
+    @{ u = 'https://sino-good.com/zh/about'; m = @('关于 SINO GOOD') },
+    @{ u = 'https://sino-good.com/en/contact'; m = @('_token','Send Message') },
+    @{ u = 'https://sino-good.com/zh/contact'; m = @('_token','发送留言') },
+    @{ u = 'https://sino-good.com/admin/login'; m = @('email','password') }
 )
 
 foreach ($c in $checks) {
@@ -45,7 +45,7 @@ foreach ($c in $checks) {
 
 $cats = @('hotel-supplies','swimming-pool','wall-panels','jw-custom-profiles','bathroom-products','indoor-outdoor-furniture')
 foreach ($cat in $cats) {
-    $u = "https://freddyk9.sg-host.com/en/category/$cat"
+    $u = "https://sino-good.com/en/category/$cat"
     $r = Test-Url $u @()
     $results += $r
     Write-Output ("{0} | {1} | category | {2}" -f $r.status, $r.bytes, $u)
@@ -53,18 +53,18 @@ foreach ($cat in $cats) {
 
 Write-Output '====ASSETS===='
 $home = Join-Path $env:TEMP 'sg_home.html'
-curl.exe -sL -o $home 'https://freddyk9.sg-host.com/en'
+curl.exe -sL -o $home 'https://sino-good.com/en'
 $homeHtml = Get-Content -Raw $home
 $rx = [regex]'/build/assets/[A-Za-z0-9._-]+'
 $assets = $rx.Matches($homeHtml) | ForEach-Object { $_.Value } | Select-Object -Unique
 foreach ($a in $assets) {
-    $u = "https://freddyk9.sg-host.com$a"
+    $u = "https://sino-good.com$a"
     $c = & curl.exe -sL -o NUL -w '%{http_code} %{size_download}' --max-time 20 $u
     Write-Output "$c $u"
 }
 
 Write-Output '====REDIRECT===='
-curl.exe -sI --max-time 20 'https://freddyk9.sg-host.com/' | Select-String -Pattern 'HTTP/|Location:'
+curl.exe -sI --max-time 20 'https://sino-good.com/' | Select-String -Pattern 'HTTP/|Location:'
 
 $out = Join-Path $PSScriptRoot 'site-health-results.json'
 # When run via temp, write to workspace

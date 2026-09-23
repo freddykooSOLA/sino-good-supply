@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             SettingSeeder::class,
             HomepageContentSeeder::class,
             WatermarkSettingsSeeder::class,
+            SeriesSeeder::class,
         ]);
     }
 }

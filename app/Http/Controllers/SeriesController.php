@@ -72,7 +72,7 @@ class SeriesController extends Controller
         return view('pages.series-show', compact('series', 'related', 'pageHero', 'watermark'));
     }
 
-    public function pdf(string $locale, string $slug, PdfWatermarkService $service): BinaryFileResponse
+    public function pdf(Request $request, string $locale, string $slug, PdfWatermarkService $service): BinaryFileResponse
     {
         $series = Series::query()
             ->active()
@@ -81,7 +81,24 @@ class SeriesController extends Controller
 
         abort_unless($series->hasPdf(), 404);
 
-        $path = $service->generateWatermarkedPdf($series->pdfAbsolutePath());
+        $original = $series->pdfAbsolutePath();
+        abort_unless($original && is_file($original), 404);
+
+        if ($request->boolean('preview')) {
+            return response()->file($original, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="catalogue-preview.pdf"',
+                'X-Content-Type-Options' => 'nosniff',
+                'Cache-Control' => 'private, max-age=60',
+            ]);
+        }
+
+        try {
+            $path = $service->generateWatermarkedPdf($original);
+        } catch (\Throwable $e) {
+            report($e);
+            $path = $original;
+        }
 
         return response()->file($path, [
             'Content-Type' => 'application/pdf',

@@ -16,9 +16,9 @@ class ManageWatermarkSettings extends Page
 
     protected static string $view = 'filament.pages.manage-watermark-settings';
 
-    protected static ?string $navigationLabel = 'PDF 水印';
+    protected static ?string $navigationLabel = '浮水印';
 
-    protected static ?string $title = 'PDF 水印设置';
+    protected static ?string $title = '浮水印设置';
 
     protected static ?string $slug = 'watermark-settings';
 
@@ -51,7 +51,7 @@ class ManageWatermarkSettings extends Page
                             ->directory('watermarks')
                             ->disk('public')
                             ->visibility('public')
-                            ->helperText('建议使用透明 PNG。未上传时将使用文字水印 “SINO GOOD”。')
+                            ->helperText('建议使用透明 PNG。未上传时将使用文字水印 “SINO GOOD”。此设置同时用于 PDF 预览，以及已开启浮水印的系列 / 产品相片。')
                             ->columnSpanFull(),
                     ]),
                 Forms\Components\Section::make('显示方式')
@@ -85,7 +85,7 @@ class ManageWatermarkSettings extends Page
                             ->maxValue(400)
                             ->required()
                             ->visible(fn (Get $get): bool => $get('pattern') === WatermarkSetting::PATTERN_TILED)
-                            ->helperText('仅平铺模式生效。'),
+                            ->helperText('仅平铺模式生效。数值需大于水印对角线，以免重叠；建议至少为大小的 0.5–1 倍。'),
                     ])
                     ->columns(2),
             ])

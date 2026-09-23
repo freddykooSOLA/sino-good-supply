@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Services\ImageWatermarkService;
+use App\Support\StoredFilePath;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -24,6 +27,7 @@ class Series extends Model
         'intro_zh_hant',
         'images',
         'pdf_path',
+        'watermark_images',
         'is_active',
         'sort_order',
     ];
@@ -32,6 +36,7 @@ class Series extends Model
     {
         return [
             'images' => 'array',
+            'watermark_images' => 'boolean',
             'is_active' => 'boolean',
             'sort_order' => 'integer',
         ];
@@ -82,36 +87,71 @@ class Series extends Model
 
     public function thumbnailUrl(): ?string
     {
-        $images = $this->images ?? [];
-
-        if (empty($images[0])) {
-            return null;
-        }
-
-        return Storage::disk('public')->url($images[0]);
+        return $this->imageUrls()[0] ?? null;
     }
 
     public function imageUrls(): array
     {
+        $apply = (bool) $this->watermark_images;
+
         return collect($this->images ?? [])
+            ->map(fn ($path) => StoredFilePath::normalize($path))
             ->filter()
-            ->map(fn ($path) => Storage::disk('public')->url($path))
+            ->map(fn (string $path) => app(ImageWatermarkService::class)->publicUrl($path, $apply))
             ->values()
             ->all();
     }
 
+    /**
+     * @return array{disk: string, path: string}|null
+     */
+    public function pdfStorageLocation(): ?array
+    {
+        $path = StoredFilePath::normalize($this->getAttributes()['pdf_path'] ?? $this->pdf_path);
+
+        if (! $path) {
+            return null;
+        }
+
+        $candidates = array_unique([
+            $path,
+            'series-pdfs/'.basename($path),
+            'pdfs/'.basename($path),
+        ]);
+
+        foreach ($candidates as $candidate) {
+            foreach (['local', 'public'] as $disk) {
+                if (Storage::disk($disk)->exists($candidate)) {
+                    return ['disk' => $disk, 'path' => $candidate];
+                }
+            }
+        }
+
+        return null;
+    }
+
     public function hasPdf(): bool
     {
-        return filled($this->pdf_path) && Storage::disk('local')->exists($this->pdf_path);
+        return $this->pdfStorageLocation() !== null;
     }
 
     public function pdfAbsolutePath(): ?string
     {
-        if (! $this->hasPdf()) {
+        $location = $this->pdfStorageLocation();
+
+        if (! $location) {
             return null;
         }
 
-        return Storage::disk('local')->path($this->pdf_path);
+        return Storage::disk($location['disk'])->path($location['path']);
+    }
+
+    protected function pdfPath(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => StoredFilePath::normalize($value),
+            set: fn ($value) => StoredFilePath::normalize($value),
+        );
     }
 
     public function scopeActive($query)

@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Filament\Support\HomepageForm;
 use App\Models\Setting;
+use App\Services\FacebookFeedService;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -63,6 +64,7 @@ class ManageSettings extends Page
             ], Setting::getValue('order_process', []) ?: []),
             'advantages' => Setting::getValue('advantages', []) ?: [],
             'visible_category_ids' => Setting::getValue('visible_category_ids', []) ?: [],
+            'facebook_connection' => $this->facebookConnectionFormState(),
             'facebook_posts' => Setting::getValue('facebook_posts', []) ?: [],
             'latest_news' => Setting::getValue('latest_news', []) ?: [],
             'about_content' => Setting::getValue('about_content', []) ?: [],
@@ -167,6 +169,15 @@ class ManageSettings extends Page
                                             ->label('WhatsApp'),
                                         Forms\Components\TextInput::make('wechat')
                                             ->label('微信'),
+                                        Forms\Components\TextInput::make('facebook_url')
+                                            ->label('Facebook 链接')
+                                            ->url(),
+                                        Forms\Components\TextInput::make('instagram_url')
+                                            ->label('Instagram 链接')
+                                            ->url(),
+                                        Forms\Components\TextInput::make('youtube_url')
+                                            ->label('YouTube 链接')
+                                            ->url(),
                                     ])
                                     ->columns(2)
                                     ->statePath('contact'),
@@ -279,12 +290,16 @@ class ManageSettings extends Page
             Setting::setValue('order_process', $state['order_process'] ?? []);
             Setting::setValue('advantages', $state['advantages'] ?? []);
             Setting::setValue('visible_category_ids', array_values($state['visible_category_ids'] ?? []));
+            $this->persistFacebookConnection($state['facebook_connection'] ?? []);
             Setting::setValue('facebook_posts', array_slice($state['facebook_posts'] ?? [], 0, 3));
             Setting::setValue('latest_news', $state['latest_news'] ?? []);
             Setting::setValue('about_content', $state['about_content'] ?? []);
 
+            $syncMessage = $this->syncFacebookFeedIfConfigured();
+
             Notification::make()
                 ->title('设置已保存')
+                ->body($syncMessage)
                 ->success()
                 ->send();
         } catch (\Throwable $e) {
@@ -298,6 +313,33 @@ class ManageSettings extends Page
         }
     }
 
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('syncFacebook')
+                ->label('同步 Facebook 帖子')
+                ->color('gray')
+                ->action(function (): void {
+                    try {
+                        $posts = app(FacebookFeedService::class)->sync();
+
+                        Notification::make()
+                            ->title('已同步 '.count($posts).' 则 Facebook 帖子')
+                            ->success()
+                            ->send();
+                    } catch (\Throwable $e) {
+                        app(FacebookFeedService::class)->recordError($e->getMessage());
+
+                        Notification::make()
+                            ->title('同步失败')
+                            ->body($e->getMessage())
+                            ->danger()
+                            ->send();
+                    }
+                }),
+        ];
+    }
+
     protected function getFormActions(): array
     {
         return [
@@ -306,6 +348,66 @@ class ManageSettings extends Page
                 ->submit('save')
                 ->keyBindings(['mod+s']),
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function facebookConnectionFormState(): array
+    {
+        $connection = app(FacebookFeedService::class)->connection();
+        $connection['access_token'] = '';
+
+        return $connection;
+    }
+
+    /**
+     * @param  array<string, mixed>  $incoming
+     */
+    protected function persistFacebookConnection(array $incoming): void
+    {
+        $existing = Setting::getValue('facebook_connection', []) ?: [];
+        $token = trim((string) ($incoming['access_token'] ?? ''));
+
+        if ($token === '') {
+            $token = (string) ($existing['access_token'] ?? '');
+        }
+
+        Setting::setValue('facebook_connection', array_merge($existing, [
+            'enabled' => (bool) ($incoming['enabled'] ?? false),
+            'page_url' => trim((string) ($incoming['page_url'] ?? '')),
+            'access_token' => $token,
+            'page_id' => $existing['page_id'] ?? null,
+            'last_synced_at' => $existing['last_synced_at'] ?? null,
+            'last_error' => $existing['last_error'] ?? null,
+        ]));
+
+        app(FacebookFeedService::class)->forgetCache();
+    }
+
+    protected function syncFacebookFeedIfConfigured(): ?string
+    {
+        $connection = app(FacebookFeedService::class)->connection();
+
+        if (empty($connection['enabled']) || ! filled($connection['page_url'] ?? null) || ! filled($connection['access_token'] ?? null)) {
+            return null;
+        }
+
+        try {
+            $posts = app(FacebookFeedService::class)->sync();
+
+            return '已同步 '.count($posts).' 则 Facebook 帖子。';
+        } catch (\Throwable $e) {
+            app(FacebookFeedService::class)->recordError($e->getMessage());
+
+            Notification::make()
+                ->title('Facebook 同步失败')
+                ->body($e->getMessage())
+                ->warning()
+                ->send();
+
+            return null;
+        }
     }
 
     protected function hasFullWidthFormActions(): bool

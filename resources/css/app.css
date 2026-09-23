@@ -135,6 +135,7 @@
 }
 
 .pdf-protect {
+    @apply relative;
     user-select: none;
     -webkit-user-select: none;
 }
@@ -144,9 +145,16 @@
 }
 
 .pdf-protect__stage {
-    @apply max-h-[80vh] overflow-auto bg-[#1a1a1a];
+    @apply relative max-h-[80vh] overflow-auto bg-[#1a1a1a];
 }
 
 .pdf-protect__page {
     @apply mx-auto my-4 block max-w-full shadow-lg;
+}
+
+.pdf-watermark-overlay {
+    @apply pointer-events-none absolute inset-0 z-10;
+    background-repeat: repeat;
+    background-position: center;
+    transform: none;
 }

@@ -3,9 +3,9 @@
 $ErrorActionPreference = "Stop"
 
 $SSH_USER = "u4328-swbmojektmmv"
-$SSH_HOST = "ssh.freddyk9.sg-host.com"
+$SSH_HOST = "ssh.sino-good.com"
 $SSH_PORT = "18765"
-$SITE_PATH = "/home/customer/www/freddyk9.sg-host.com/sinogood"
+$SITE_PATH = "/home/customer/www/sino-good.com/sinogood"
 $SSH_KEY = "$env:USERPROFILE\.ssh\sinogood_siteground"
 $PHP_BIN = "/usr/local/bin/php84"
 $COMPOSER_PHAR = "/usr/local/bin/composer.phar"
@@ -41,5 +41,5 @@ scp -i $SSH_KEY -o IdentitiesOnly=yes -P $SSH_PORT -r "public\build" "${SSH_USER
 
 Write-Host "==> Deployment complete!"
 Write-Host "Document Root must point to: $SITE_PATH/public"
-Write-Host "Site: https://freddyk9.sg-host.com"
-Write-Host "Admin: https://freddyk9.sg-host.com/admin"
+Write-Host "Site: https://sino-good.com"
+Write-Host "Admin: https://sino-good.com/admin"

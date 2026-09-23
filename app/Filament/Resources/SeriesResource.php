@@ -135,13 +135,24 @@ class SeriesResource extends Resource
                         );
                     })
                     ->columnSpanFull(),
+                Forms\Components\Toggle::make('watermark_images')
+                    ->label('系列相片加浮水印')
+                    ->helperText('开启后前台相片套用后台浮水印设置；关闭则显示原图。')
+                    ->default(true)
+                    ->inline(false),
                 Forms\Components\FileUpload::make('pdf_path')
                     ->label('系列 PDF（仅预览，不可下载）')
-                    ->acceptedFileTypes(['application/pdf'])
+                    ->acceptedFileTypes(['application/pdf', 'application/x-pdf'])
                     ->directory('series-pdfs')
                     ->disk('local')
+                    ->visibility('private')
                     ->maxSize(51200)
-                    ->helperText('PDF 会存储为私有文件，前台仅提供带水印预览。')
+                    ->downloadable()
+                    ->openable()
+                    ->dehydrateStateUsing(function ($state) {
+                        return \App\Support\StoredFilePath::normalize($state);
+                    })
+                    ->helperText('PDF 会存储为私有文件，前台仅提供带水印预览。若保存后前台仍不显示，请重新上传一次。')
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('sort_order')
                     ->label('排序')
@@ -174,7 +185,7 @@ class SeriesResource extends Resource
                 Tables\Columns\IconColumn::make('pdf_path')
                     ->label('PDF')
                     ->boolean()
-                    ->getStateUsing(fn (Series $record) => filled($record->pdf_path)),
+                    ->getStateUsing(fn (Series $record) => $record->hasPdf()),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('状态')
                     ->boolean(),

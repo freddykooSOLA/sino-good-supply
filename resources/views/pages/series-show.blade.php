@@ -109,14 +109,22 @@
                 <div
                     class="pdf-protect mt-10 overflow-hidden border border-white/10 bg-charcoal"
                     data-pdf-preview
-                    data-pdf-url="{{ route('series.pdf', ['locale' => $currentLocale, 'slug' => $series->localizedSlug()]) }}"
+                    data-pdf-url="{{ route('series.pdf', ['locale' => $currentLocale, 'slug' => $series->localizedSlug(), 'preview' => 1]) }}"
                     data-watermark='@json($watermark)'
                 >
                     <div class="pdf-protect__toolbar">{{ __('messages.pdf_preview_protected') }}</div>
-                    <div class="pdf-protect__stage" data-pdf-stage>
+                    <div class="pdf-protect__stage relative" data-pdf-stage>
                         <p class="px-6 py-16 text-center text-sm text-white/50">{{ __('messages.pdf_loading') }}</p>
                     </div>
+                    <div class="pdf-watermark-overlay" data-pdf-watermark-overlay hidden aria-hidden="true"></div>
                 </div>
+            </div>
+        </section>
+    @elseif(filled($series->pdf_path))
+        <section class="border-t border-white/10 bg-primary-black">
+            <div class="section-pad">
+                <h2 class="section-title">{{ __('messages.pdf_preview') }}</h2>
+                <p class="section-sub">PDF file is not available yet. Please re-upload it in the admin panel.</p>
             </div>
         </section>
     @endif

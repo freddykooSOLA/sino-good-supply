@@ -290,9 +290,9 @@ function initPdfPreview() {
             return;
         }
 
-        const opacity = Number(watermark.opacity ?? 0.18);
+        const opacity = Math.max(0.08, Number(watermark.opacity ?? 0.18));
         const size = Math.max(24, Number(watermark.size ?? 140));
-        const spacing = Math.max(20, Number(watermark.spacing ?? 90));
+        const spacing = Math.max(size * 0.45, Number(watermark.spacing ?? 90));
         const pattern = watermark.pattern === 'centered' ? 'centered' : 'tiled';
 
         ctx.save();
@@ -322,8 +322,9 @@ function initPdfPreview() {
         if (pattern === 'centered') {
             drawOne(canvas.width / 2, canvas.height / 2, size * 1.6);
         } else {
-            for (let y = 0; y < canvas.height + size; y += size + spacing) {
-                for (let x = 0; x < canvas.width + size; x += size + spacing) {
+            const step = Math.hypot(size, size) + spacing;
+            for (let y = step / 2; y < canvas.height + size; y += step) {
+                for (let x = step / 2; x < canvas.width + size; x += step) {
                     drawOne(x, y, size);
                 }
             }
@@ -352,6 +353,19 @@ function initPdfPreview() {
         } catch (error) {
             console.error(error);
             stage.innerHTML = `<iframe class="h-[80vh] w-full border-0" src="${url}#toolbar=0&navpanes=0&scrollbar=0" title="PDF preview"></iframe>`;
+            const overlay = root.querySelector('[data-pdf-watermark-overlay]');
+            if (overlay) {
+                overlay.hidden = false;
+                const size = Math.max(80, Number(watermark.size ?? 140));
+                const spacing = Math.max(size, Number(watermark.spacing ?? 90));
+                overlay.style.opacity = String(Math.max(0.12, Number(watermark.opacity ?? 0.18)));
+                overlay.style.backgroundImage = watermark.image
+                    ? `url("${watermark.image}")`
+                    : 'none';
+                overlay.style.backgroundSize = `${size}px auto`;
+                overlay.style.backgroundRepeat = watermark.pattern === 'centered' ? 'no-repeat' : 'repeat';
+                overlay.style.transform = 'rotate(-20deg) scale(1.4)';
+            }
         }
     })();
 }

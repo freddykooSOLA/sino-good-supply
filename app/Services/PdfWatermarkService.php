@@ -17,6 +17,8 @@ class PdfWatermarkService
             throw new \RuntimeException('PDF file not found.');
         }
 
+        @ini_set('memory_limit', '512M');
+
         $cachePath = $this->cachePath($originalPdfPath, $settings);
 
         if (is_file($cachePath) && filemtime($cachePath) >= filemtime($originalPdfPath)) {
@@ -25,12 +27,13 @@ class PdfWatermarkService
 
         try {
             $this->stampWithFpdi($originalPdfPath, $cachePath, $settings);
+
+            return is_file($cachePath) ? $cachePath : $originalPdfPath;
         } catch (Throwable $e) {
             report($e);
-            copy($originalPdfPath, $cachePath);
-        }
 
-        return $cachePath;
+            return $originalPdfPath;
+        }
     }
 
     protected function stampWithFpdi(string $source, string $destination, WatermarkSetting $settings): void
@@ -98,12 +101,12 @@ class PdfWatermarkService
         $height = $ratio > 0 ? $target / $ratio : $target;
 
         if ($settings->isTiled()) {
-            $spacing = max(10, (int) $settings->spacing);
-            $stepX = $width + $spacing;
-            $stepY = $height + $spacing;
+            $diag = hypot($width, $height);
+            $spacing = max((int) $settings->spacing, (int) round($diag * 0.35));
+            $step = $diag + $spacing;
 
-            for ($y = -$height; $y < $pageHeight + $height; $y += $stepY) {
-                for ($x = -$width; $x < $pageWidth + $width; $x += $stepX) {
+            for ($y = -$diag; $y < $pageHeight + $diag; $y += $step) {
+                for ($x = -$diag; $x < $pageWidth + $diag; $x += $step) {
                     $this->drawRotatedImage($pdf, $stamp['path'], $x, $y, $width, $height);
                 }
             }
@@ -125,12 +128,12 @@ class PdfWatermarkService
         $textWidth = $pdf->GetStringWidth($text);
 
         if ($settings->isTiled()) {
-            $spacing = max(20, (int) $settings->spacing);
-            $stepX = $textWidth + $spacing;
-            $stepY = $fontSize + $spacing;
+            $diag = hypot($textWidth, $fontSize * 1.4);
+            $spacing = max((int) $settings->spacing, (int) round($diag * 0.4));
+            $step = $diag + $spacing;
 
-            for ($y = 20; $y < $pageHeight; $y += $stepY) {
-                for ($x = 10; $x < $pageWidth; $x += $stepX) {
+            for ($y = 20; $y < $pageHeight + $diag; $y += $step) {
+                for ($x = 10; $x < $pageWidth + $diag; $x += $step) {
                     $this->drawRotatedText($pdf, $text, $x, $y, $fontSize);
                 }
             }
@@ -207,6 +210,7 @@ class PdfWatermarkService
     protected function cachePath(string $originalPdfPath, WatermarkSetting $settings): string
     {
         $hash = sha1(implode('|', [
+            'wm-v2',
             $originalPdfPath,
             (string) filemtime($originalPdfPath),
             (string) $settings->updated_at,

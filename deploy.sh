@@ -4,9 +4,9 @@
 set -euo pipefail
 
 SSH_USER="u4328-swbmojektmmv"
-SSH_HOST="ssh.freddyk9.sg-host.com"
+SSH_HOST="ssh.sino-good.com"
 SSH_PORT="18765"
-SITE_PATH="/home/customer/www/freddyk9.sg-host.com/sinogood"
+SITE_PATH="/home/customer/www/sino-good.com/sinogood"
 SSH_KEY="${HOME}/.ssh/sinogood_siteground"
 PHP_BIN="/usr/local/bin/php84"
 COMPOSER_PHAR="/usr/local/bin/composer.phar"
@@ -35,5 +35,5 @@ EOF
 
 echo "==> Deployment complete!"
 echo "Document Root must point to: ${SITE_PATH}/public"
-echo "Site: https://freddyk9.sg-host.com"
-echo "Admin: https://freddyk9.sg-host.com/admin"
+echo "Site: https://sino-good.com"
+echo "Admin: https://sino-good.com/admin"

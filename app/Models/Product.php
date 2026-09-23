@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Services\ImageWatermarkService;
+use App\Support\StoredFilePath;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
@@ -26,6 +28,7 @@ class Product extends Model
         'specs',
         'images',
         'pdf_path',
+        'watermark_images',
         'sort_order',
         'is_featured',
         'is_active',
@@ -36,6 +39,7 @@ class Product extends Model
         return [
             'specs' => 'array',
             'images' => 'array',
+            'watermark_images' => 'boolean',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
             'sort_order' => 'integer',
@@ -98,20 +102,17 @@ class Product extends Model
 
     public function thumbnailUrl(): ?string
     {
-        $images = $this->images ?? [];
-
-        if (empty($images[0])) {
-            return null;
-        }
-
-        return Storage::disk('public')->url($images[0]);
+        return $this->imageUrls()[0] ?? null;
     }
 
     public function imageUrls(): array
     {
+        $apply = (bool) $this->watermark_images;
+
         return collect($this->images ?? [])
+            ->map(fn ($path) => StoredFilePath::normalize($path))
             ->filter()
-            ->map(fn ($path) => Storage::disk('public')->url($path))
+            ->map(fn (string $path) => app(ImageWatermarkService::class)->publicUrl($path, $apply))
             ->values()
             ->all();
     }

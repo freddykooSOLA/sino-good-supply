@@ -73,6 +73,7 @@ class WatermarkSetting extends Model
             'pattern' => $this->isTiled() ? self::PATTERN_TILED : self::PATTERN_CENTERED,
             'spacing' => max(0, (int) $this->spacing),
             'text' => 'SINO GOOD',
+            'apply' => true,
         ];
     }
 }
