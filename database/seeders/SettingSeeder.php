@@ -67,7 +67,7 @@ class SettingSeeder extends Seeder
             ],
             'order_process' => [
                 'image' => null,
-                'title_en' => 'Order Process',
+                'title_en' => 'How SINO Do',
                 'title_zh' => '落单流程',
                 'title_zh_hant' => '落單流程',
                 'subtitle_en' => 'From briefing to delivery — a clear, project-led workflow.',
@@ -94,7 +94,7 @@ class SettingSeeder extends Seeder
             'email' => 'info@sinogood.com',
             'whatsapp' => '+1 370 244 6468',
             'wechat' => '',
-            'facebook_url' => 'https://www.facebook.com/search/top?q=SINO+GOOD+QY+SUPPLY+CHAIN',
+            'facebook_url' => 'https://www.facebook.com/profile.php?id=61582840223538',
             'instagram_url' => 'https://www.instagram.com/sino.good/',
             'youtube_url' => 'https://www.youtube.com/@Fionlam1105',
             'media_type' => 'none',

@@ -11,9 +11,9 @@ class HomepageContentSeeder extends Seeder
     {
         $this->seedIfMissing('homepage_headings', [
             'core_business' => [
-                'title_en' => 'What We Do',
-                'title_zh' => '主要业务',
-                'title_zh_hant' => '主要業務',
+                'title_en' => 'What SINO Do',
+                'title_zh' => 'SINO 做什么',
+                'title_zh_hant' => 'SINO 做什麼',
                 'subtitle_en' => 'High-quality customized service solutions — not a simple product catalogue.',
                 'subtitle_zh' => '提供高质定制服务方案，而非单纯卖产品。',
                 'subtitle_zh_hant' => '提供高質定制服務方案，而非單純賣產品。',
@@ -27,22 +27,22 @@ class HomepageContentSeeder extends Seeder
                 'subtitle_zh_hant' => '以定制服務方案交付的酒店項目。',
             ],
             'order_process' => [
-                'title_en' => 'Order Process',
-                'title_zh' => '落单流程',
-                'title_zh_hant' => '落單流程',
+                'title_en' => 'How SINO Do',
+                'title_zh' => 'SINO 怎么做',
+                'title_zh_hant' => 'SINO 怎麼做',
                 'subtitle_en' => 'From briefing to delivery — a clear, project-led workflow.',
                 'subtitle_zh' => '从需求沟通到交付，清晰的项目化工作流程。',
                 'subtitle_zh_hant' => '從需求溝通到交付，清晰的項目化工作流程。',
             ],
             'advantages' => [
-                'title_en' => 'Why SINO GOOD',
-                'title_zh' => '为什么选择 SINO GOOD',
-                'title_zh_hant' => '為什麼選擇 SINO GOOD',
+                'title_en' => 'WHY SINO',
+                'title_zh' => '为何 SINO',
+                'title_zh_hant' => '為何 SINO',
             ],
             'product_categories' => [
-                'title_en' => 'Product Categories',
-                'title_zh' => '产品类别',
-                'title_zh_hant' => '產品類別',
+                'title_en' => 'SINO supplier chain',
+                'title_zh' => 'SINO 供应链',
+                'title_zh_hant' => 'SINO 供應鏈',
                 'subtitle_en' => 'Explore series by category. Each series is a curated solution, not a single SKU.',
                 'subtitle_zh' => '按类别浏览系列。每个系列都是一套方案，而非单一产品。',
                 'subtitle_zh_hant' => '按類別瀏覽系列。每個系列都是一套方案，而非單一產品。',
@@ -53,9 +53,9 @@ class HomepageContentSeeder extends Seeder
                 'title_zh_hant' => 'Facebook 最新發布',
             ],
             'latest_news' => [
-                'title_en' => 'Latest Updates',
-                'title_zh' => '最新动向',
-                'title_zh_hant' => '最新動向',
+                'title_en' => 'SINO Daily / SHOWCASE',
+                'title_zh' => 'SINO Daily / SHOWCASE',
+                'title_zh_hant' => 'SINO Daily / SHOWCASE',
             ],
         ]);
 

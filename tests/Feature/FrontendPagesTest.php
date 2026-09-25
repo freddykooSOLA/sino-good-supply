@@ -36,7 +36,7 @@ class FrontendPagesTest extends TestCase
         $this->get('/en/cases')->assertOk();
         $this->get('/en/order-process')->assertOk();
         $this->get('/en/products')->assertOk();
-        $this->get('/zh/order-process')->assertOk()->assertSee('落单流程', false);
+        $this->get('/zh/order-process')->assertOk()->assertSee('SINO 怎么做', false);
         $this->get('/zh-hant/about')->assertOk();
     }
 
