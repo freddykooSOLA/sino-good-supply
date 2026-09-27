@@ -162,6 +162,7 @@ function seriesPlan(): array
         'terrace-lounge-series' => [
             'category' => 'indoor-outdoor-furniture',
             'sources' => [
+                'company-overview/overview_p20_outdoor.png',
                 'unsorted-jiayi/jiayi-furniture_p0003_img1.jpeg',
                 'unsorted-jiayi/jiayi-furniture_p0003_img2.jpeg',
                 'unsorted-jiayi/jiayi-furniture_p0013_img1.jpeg',
@@ -173,7 +174,16 @@ function seriesPlan(): array
             'intro_zh' => '嘉翊 JIAYI 露台休闲户外家具：金属藤铁及压铸铝沙发、单椅与躺椅（型号 JY-8xxx 系列），适用于泳池甲板、别墅露台与酒店户外酒吧区。',
             'intro_zh_hant' => '嘉翊 JIAYI 露台休閒戶外家具：金屬藤鐵及壓鑄鋁沙發、單椅與躺椅（型號 JY-8xxx 系列），適用於泳池甲板、別墅露台與酒店戶外酒吧區。',
         ],
-        // indoor-lobby-seating-series intentionally omitted — keep placeholders
+        'indoor-lobby-seating-series' => [
+            'category' => 'indoor-outdoor-furniture',
+            'sources' => [
+                'company-overview/overview_p21_indoor_sofa.png',
+                'company-overview/overview_p21_lobby.png',
+            ],
+            'intro_en' => 'Indoor seating and hotel lobby schemes from the Sino-Good supply deck: lounge sofas for guest areas, plus stone-clad lobby and custom joinery for hotel and villa projects.',
+            'intro_zh' => '室内座椅与酒店大堂方案，取自 SINO GOOD 供应简报：客区沙发，以及石材大堂与酒店、别墅定制木作。',
+            'intro_zh_hant' => '室內座椅與酒店大堂方案，取自 SINO GOOD 供應簡報：客區沙發，以及石材大堂與酒店、別墅定制木作。',
+        ],
     ];
 }
 
@@ -263,11 +273,6 @@ function runSeriesImagesIntegration(): array
 
         $results[$slugEn] = $publicPaths;
         logLine($log, "Updated series: {$slugEn} (".count($publicPaths).' images)');
-    }
-
-    $lobby = Series::query()->where('slug_en', 'indoor-lobby-seating-series')->first();
-    if ($lobby) {
-        logLine($log, 'indoor-lobby-seating-series UNCHANGED (placeholder images retained): '.json_encode($lobby->images));
     }
 
     logLine($log, '=== Summary ===');
