@@ -131,6 +131,26 @@ if (! function_exists('hero_settings')) {
     }
 }
 
+if (! function_exists('case_study_display_title')) {
+    /**
+     * Replace placeholder demo titles with professional generic labels until client confirms real project names.
+     */
+    function case_study_display_title(?string $title, int $index = 1): string
+    {
+        $title = trim((string) $title);
+        $isPlaceholder = $title === ''
+            || preg_match('/^demo(\s*\d+)?$/i', $title) === 1;
+
+        if ($isPlaceholder) {
+            return __('messages.case_placeholder_title', [
+                'number' => str_pad((string) max(1, $index), 2, '0', STR_PAD_LEFT),
+            ]);
+        }
+
+        return $title;
+    }
+}
+
 if (! function_exists('google_maps_embed_src')) {
     function google_maps_embed_src(?string $raw): ?string
     {

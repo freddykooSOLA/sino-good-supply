@@ -152,8 +152,59 @@ function initProductSliders(root = document) {
 document.addEventListener('DOMContentLoaded', () => {
     initProductSliders();
     initHomeHero();
+    initCaseVideoPosters();
     initPdfPreview();
 });
+
+function initCaseVideoPosters() {
+    document.querySelectorAll('video[data-video-poster]').forEach((video) => {
+        if (video.dataset.posterReady === '1' || video.poster) {
+            return;
+        }
+
+        const captureFrame = () => {
+            if (! video.videoWidth || ! video.videoHeight) {
+                return;
+            }
+
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const context = canvas.getContext('2d');
+                if (! context) {
+                    return;
+                }
+
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                video.poster = canvas.toDataURL('image/jpeg', 0.82);
+                video.dataset.posterReady = '1';
+            } catch {
+                // Cross-origin or tainted canvas — keep default preview.
+            }
+        };
+
+        const prime = () => {
+            if (video.readyState >= 2) {
+                captureFrame();
+                return;
+            }
+
+            video.addEventListener('loadeddata', captureFrame, { once: true });
+            try {
+                video.currentTime = Math.min(0.25, video.duration || 0.25);
+            } catch {
+                captureFrame();
+            }
+        };
+
+        if (video.readyState >= 1) {
+            prime();
+        } else {
+            video.addEventListener('loadedmetadata', prime, { once: true });
+        }
+    });
+}
 
 function initHomeHero() {
     const root = document.querySelector('[data-home-hero]');

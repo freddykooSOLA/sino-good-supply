@@ -32,6 +32,7 @@ class FrontendPagesTest extends TestCase
     public function test_core_pages_are_ok(): void
     {
         $this->get('/en/about')->assertOk();
+        $this->get('/en/faq')->assertOk()->assertSee('Draft placeholder content', false);
         $this->get('/en/contact')->assertOk();
         $this->get('/en/cases')->assertOk();
         $this->get('/en/order-process')->assertOk();
@@ -211,6 +212,24 @@ class FrontendPagesTest extends TestCase
         $url = $series->imageUrls()[0] ?? '';
         $this->assertStringContainsString('/storage/series/plain.jpg', $url);
         $this->assertStringNotContainsString('/media/wm/', $url);
+    }
+
+    public function test_demo_case_titles_use_professional_placeholders(): void
+    {
+        $case = \App\Models\CaseStudy::query()->create([
+            'title_en' => 'demo1',
+            'title_zh' => 'demo1',
+            'title_zh_hant' => 'demo1',
+            'video_type' => \App\Models\CaseStudy::VIDEO_YOUTUBE,
+            'youtube_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            'sort_order' => 1,
+            'is_active' => true,
+        ]);
+
+        $this->get('/en/cases')
+            ->assertOk()
+            ->assertSee('Hotel guestroom project 01', false)
+            ->assertDontSee('demo1', false);
     }
 
     public function test_watermark_settings_exist(): void

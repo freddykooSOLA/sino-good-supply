@@ -6,6 +6,8 @@ return [
     'nav_cases' => 'Case Studies',
     'nav_about' => 'About',
     'nav_contact' => 'Contact',
+    'nav_faq' => 'FAQ',
+    'language' => 'Language',
     'nav_order_process' => 'How SINO Do',
     'cases_title' => 'Case Studies',
     'cases_intro' => 'Selected hotel and hospitality projects delivered with SINO GOOD customized supply solutions.',
@@ -61,4 +63,34 @@ return [
     'company_footer' => 'SINO GOOD QY SUPPLY CHAIN CO., LTD',
     'whatsapp' => 'WhatsApp',
     'follow_us' => 'Follow us',
+    'case_placeholder_title' => 'Hotel guestroom project :number',
+    'faq_title' => 'FAQ',
+    'faq_intro' => 'Common questions about working with SINO GOOD on hotel supply projects.',
+    'faq_draft_notice' => 'Draft placeholder content — awaiting confirmation from Sino-Good. Answers below are general guidance only, not final commitments.',
+    'faq_items' => [
+        [
+            'q' => 'How long does a typical order process take?',
+            'a' => 'Timelines depend on product scope, customization, and logistics. After a project briefing, SINO GOOD will outline milestones from sampling through delivery.',
+        ],
+        [
+            'q' => 'Which hotel supply categories do you support?',
+            'a' => 'We support project-led sourcing across guestroom supplies, bathroom products, furniture, wall panels, pools, and related hospitality categories.',
+        ],
+        [
+            'q' => 'Can products be customized for our brand or specification?',
+            'a' => 'Yes — SINO GOOD focuses on customized, project-based solutions rather than off-the-shelf catalogue sales.',
+        ],
+        [
+            'q' => 'Do you work with European hotel projects remotely?',
+            'a' => 'We coordinate briefing, sampling, and delivery with European project teams. Specific regions and channels will be confirmed per project.',
+        ],
+        [
+            'q' => 'How do we start a new project enquiry?',
+            'a' => 'Use the contact form or reach us via WhatsApp with your project outline. We will respond with next steps for briefing and quotation.',
+        ],
+        [
+            'q' => 'What information should we prepare for the first briefing?',
+            'a' => 'Helpful inputs include floor plans or room counts, target standards, preferred materials, and delivery window — even as a draft.',
+        ],
+    ],
 ];

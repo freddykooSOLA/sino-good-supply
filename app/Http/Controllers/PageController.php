@@ -11,6 +11,13 @@ use Illuminate\View\View;
 
 class PageController extends Controller
 {
+    public function faq(): View
+    {
+        $pageHero = page_hero('faq');
+
+        return view('pages.faq', compact('pageHero'));
+    }
+
     public function about(): View
     {
         $stats = Setting::getValue('company_stats', []);

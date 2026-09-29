@@ -64,18 +64,21 @@ class HomeController extends Controller
             : collect();
 
         return collect($items)
-            ->map(function (array $item) use ($cases) {
+            ->values()
+            ->map(function (array $item, int $index) use ($cases) {
                 $case = $cases->get($item['case_id'] ?? null);
+                $ordinal = $index + 1;
 
                 if ($case instanceof CaseStudy) {
-                    $item['resolved_title'] = localized_setting($item, 'title') ?: $case->localizedTitle();
+                    $rawTitle = localized_setting($item, 'title') ?: $case->localizedTitle();
+                    $item['resolved_title'] = case_study_display_title($rawTitle, $ordinal);
                     $item['resolved_image'] = $item['image'] ?? null;
                     $item['resolved_link'] = $item['link'] ?? $case->youtube_url;
                     $item['resolved_thumb'] = $case->thumbnailUrl();
                     $item['resolved_embed'] = $case->embedUrl();
                     $item['resolved_video'] = $case->uploadedVideoUrl();
                 } else {
-                    $item['resolved_title'] = localized_setting($item, 'title');
+                    $item['resolved_title'] = case_study_display_title(localized_setting($item, 'title'), $ordinal);
                     $item['resolved_image'] = $item['image'] ?? null;
                     $item['resolved_link'] = $item['link'] ?? null;
                     $item['resolved_thumb'] = null;
@@ -85,7 +88,7 @@ class HomeController extends Controller
 
                 return $item;
             })
-            ->filter(fn (array $item) => filled($item['resolved_title']) || filled($item['resolved_image']) || filled($item['resolved_thumb']))
+            ->filter(fn (array $item) => filled($item['resolved_title']) || filled($item['resolved_image']) || filled($item['resolved_thumb']) || filled($item['resolved_video']))
             ->values()
             ->all();
     }

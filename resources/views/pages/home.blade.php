@@ -39,23 +39,23 @@
                         <img
                             src="{{ public_storage_url($slide['image']) }}"
                             alt=""
-                            class="h-full w-full object-cover opacity-55 {{ $autoplay ? 'hero-slide' : '' }}"
+                            class="h-full w-full object-cover opacity-[0.68] {{ $autoplay ? 'hero-slide' : '' }}"
                         >
                     @else
                         <div class="h-full w-full bg-[radial-gradient(ellipse_at_top_right,_rgba(201,168,76,0.28),_transparent_55%),linear-gradient(160deg,#1a1a1a_0%,#2c2c2c_55%,#151515_100%)]"></div>
                     @endif
-                    <div class="absolute inset-0 bg-gradient-to-t from-primary-black via-primary-black/55 to-primary-black/25"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-primary-black/95 via-primary-black/40 to-primary-black/10"></div>
                 </div>
             @empty
                 <div class="absolute inset-0">
                     <div class="h-full w-full bg-[radial-gradient(ellipse_at_top_right,_rgba(201,168,76,0.28),_transparent_55%),linear-gradient(160deg,#1a1a1a_0%,#2c2c2c_55%,#151515_100%)]"></div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-primary-black via-primary-black/55 to-primary-black/25"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-primary-black/95 via-primary-black/40 to-primary-black/10"></div>
                 </div>
             @endforelse
         </div>
 
-        <div class="relative mx-auto flex min-h-screen max-w-7xl flex-col justify-end px-4 pb-20 pt-32 lg:px-8 lg:pb-28">
-            <div class="fade-up max-w-3xl" data-hero-copy>
+        <div class="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-end px-4 pb-24 pt-32 lg:px-8 lg:pb-28">
+            <div class="fade-up hero-copy-panel max-w-3xl" data-hero-copy>
                 @forelse($slides as $index => $slide)
                     <div
                         class="hero-carousel-copy {{ $index === 0 ? 'is-active' : '' }}"
@@ -63,13 +63,13 @@
                         @if($index !== 0) hidden @endif
                     >
                         <div class="mb-5 text-sm font-semibold tracking-[0.28em] text-gold-accent">SINO GOOD</div>
-                        <h1 class="text-3xl font-semibold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
+                        <h1 class="hero-headline text-3xl font-semibold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
                             {{ localized_setting($slide, 'title') ?: 'SINO GOOD' }}
                         </h1>
                         <p class="mt-5 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg">
                             {{ localized_setting($slide, 'subtitle') ?: __('messages.tagline') }}
                         </p>
-                        <div class="mt-8 flex flex-wrap gap-4">
+                        <div class="mt-8 flex flex-wrap gap-3 sm:gap-4">
                             <a href="{{ $slide['link'] ?? locale_url('products') }}" class="btn-gold">
                                 {{ localized_setting($slide, 'button_text') ?: __('messages.explore') }}
                             </a>
@@ -79,7 +79,7 @@
                 @empty
                     <div>
                         <div class="mb-5 text-sm font-semibold tracking-[0.28em] text-gold-accent">SINO GOOD</div>
-                        <h1 class="text-3xl font-semibold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">SINO GOOD</h1>
+                        <h1 class="hero-headline text-3xl font-semibold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">SINO GOOD</h1>
                         <p class="mt-5 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg">{{ __('messages.tagline') }}</p>
                         <div class="mt-8 flex flex-wrap gap-4">
                             <a href="{{ locale_url('products') }}" class="btn-gold">{{ __('messages.explore') }}</a>
@@ -90,7 +90,7 @@
             </div>
 
             @if($slides->count() > 1)
-                <div class="mt-10 flex items-center gap-4">
+                <div class="hero-carousel-controls relative z-20 mt-12 flex items-center gap-4 border-t border-white/10 pt-6 sm:mt-10 sm:border-0 sm:pt-0">
                     <button type="button" class="product-slider__nav !static !translate-y-0 !opacity-100" data-hero-prev aria-label="Previous slide">
                         <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M12.79 5.23a.75.75 0 01-.02 1.06L9.06 10l3.71 3.71a.75.75 0 11-1.06 1.06l-4.25-4.25a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.08.02z"/></svg>
                     </button>
@@ -118,12 +118,16 @@
                     @endif
                 </div>
                 <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                    @foreach($coreBusiness as $item)
+                    @foreach($coreBusiness as $index => $item)
+                        @php
+                            $coreIcons = ['briefcase', 'cube', 'truck'];
+                            $coreIcon = $coreIcons[$index % count($coreIcons)];
+                        @endphp
                         <article class="border border-white/10 bg-primary-black p-8">
                             @if(!empty($item['image']))
                                 <img src="{{ public_storage_url($item['image']) }}" alt="" class="mb-6 h-12 w-12 object-contain">
                             @else
-                                <div class="mb-6 h-px w-10 bg-gold-accent"></div>
+                                <div class="mb-6">@include('partials.line-icon', ['name' => $coreIcon])</div>
                             @endif
                             <h3 class="text-lg font-medium text-white">{{ localized_setting($item, 'title') }}</h3>
                             <p class="mt-3 text-sm leading-relaxed text-white/60">{{ localized_setting($item, 'description') }}</p>
@@ -152,7 +156,7 @@
                         <article class="group">
                             <div class="aspect-video overflow-hidden bg-charcoal">
                                 @if(!empty($item['resolved_video']))
-                                    <video class="h-full w-full object-cover" controls preload="metadata" playsinline src="{{ $item['resolved_video'] }}"></video>
+                                    <video class="h-full w-full object-cover" controls preload="metadata" playsinline muted data-video-poster src="{{ $item['resolved_video'] }}"></video>
                                 @elseif(!empty($item['resolved_embed']))
                                     <iframe class="h-full w-full" src="{{ $item['resolved_embed'] }}" title="{{ $item['resolved_title'] }}" loading="lazy" allowfullscreen></iframe>
                                 @elseif(!empty($item['resolved_image']))
@@ -212,12 +216,16 @@
                 <p class="section-sub">{{ $advHeading['subtitle'] }}</p>
             @endif
             <div class="mt-12 grid gap-10 md:grid-cols-2 lg:grid-cols-4">
-                @forelse($advantages as $item)
+                @forelse($advantages as $index => $item)
+                    @php
+                        $advIcons = ['shield-check', 'truck', 'wrench-screwdriver', 'globe-alt'];
+                        $advIcon = $advIcons[$index % count($advIcons)];
+                    @endphp
                     <div>
                         @if(!empty($item['image']))
                             <img src="{{ public_storage_url($item['image']) }}" alt="" class="mb-4 h-10 w-10 object-contain">
                         @else
-                            <div class="mb-4 h-px w-10 bg-gold-accent"></div>
+                            <div class="mb-4">@include('partials.line-icon', ['name' => $advIcon, 'class' => 'h-7 w-7 text-gold-accent'])</div>
                         @endif
                         <h3 class="text-lg font-medium text-white">{{ localized_setting($item, 'title') }}</h3>
                         <p class="mt-3 text-sm leading-relaxed text-white/60">{{ localized_setting($item, 'description') }}</p>
@@ -239,13 +247,19 @@
             </div>
 
             @if(!empty($stats))
-                <div class="mt-16 grid grid-cols-2 gap-8 border-t border-white/10 pt-12 md:grid-cols-4">
-                    @foreach($stats as $stat)
-                        <div>
-                            <div class="text-3xl font-semibold text-gold-accent">{{ $stat['value'] ?? '' }}</div>
-                            <div class="mt-2 text-sm text-white/55">{{ localized_setting($stat, 'label') }}</div>
-                        </div>
-                    @endforeach
+                <div class="mt-16 border-t border-white/10 pt-12">
+                    <div class="mb-8 flex items-center gap-3 text-white/50">
+                        @include('partials.line-icon', ['name' => 'chart-bar', 'class' => 'h-5 w-5 text-gold-accent/80'])
+                        <span class="h-px flex-1 bg-gradient-to-r from-gold-accent/40 to-transparent"></span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-8 md:grid-cols-4 md:gap-6">
+                        @foreach($stats as $stat)
+                            <div class="md:border-l md:border-white/10 md:pl-6 first:md:border-l-0 first:md:pl-0">
+                                <div class="text-3xl font-semibold text-gold-accent">{{ $stat['value'] ?? '' }}</div>
+                                <div class="mt-2 text-sm text-white/55">{{ localized_setting($stat, 'label') }}</div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             @endif
         </div>

@@ -42,6 +42,7 @@
                 <a href="{{ locale_url('cases') }}" class="nav-link">{{ __('messages.nav_cases') }}</a>
                 <a href="{{ locale_url('order-process') }}" class="nav-link">{{ __('messages.nav_order_process') }}</a>
                 <a href="{{ locale_url('about') }}" class="nav-link">{{ __('messages.nav_about') }}</a>
+                <a href="{{ locale_url('faq') }}" class="nav-link">{{ __('messages.nav_faq') }}</a>
                 <a href="{{ locale_url('contact') }}" class="nav-link">{{ __('messages.nav_contact') }}</a>
             </nav>
 
@@ -71,11 +72,15 @@
                 <a href="{{ locale_url('cases') }}" class="block py-2 text-white/90">{{ __('messages.nav_cases') }}</a>
                 <a href="{{ locale_url('order-process') }}" class="block py-2 text-white/90">{{ __('messages.nav_order_process') }}</a>
                 <a href="{{ locale_url('about') }}" class="block py-2 text-white/90">{{ __('messages.nav_about') }}</a>
+                <a href="{{ locale_url('faq') }}" class="block py-2 text-white/90">{{ __('messages.nav_faq') }}</a>
                 <a href="{{ locale_url('contact') }}" class="block py-2 text-white/90">{{ __('messages.nav_contact') }}</a>
-                <div class="flex gap-3 pt-3 text-sm">
-                    @foreach($locales as $code => $label)
-                        <a href="{{ switch_locale_url($code) }}" class="{{ ($currentLocale ?? 'en') === $code ? 'text-gold-accent' : 'text-white/60' }}">{{ $label }}</a>
-                    @endforeach
+                <div class="mt-4 border-t border-white/10 pt-4">
+                    <div class="text-xs font-medium uppercase tracking-wider text-white/40">{{ __('messages.language') }}</div>
+                    <div class="mt-2 flex flex-wrap gap-3 text-sm">
+                        @foreach($locales as $code => $label)
+                            <a href="{{ switch_locale_url($code) }}" class="{{ ($currentLocale ?? 'en') === $code ? 'text-gold-accent' : 'text-white/60' }}">{{ $label }}</a>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>

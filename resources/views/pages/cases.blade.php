@@ -16,6 +16,7 @@
             @else
                 <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach($cases as $case)
+                        @php $caseTitle = case_study_display_title($case->localizedTitle(), $loop->iteration); @endphp
                         <article class="group">
                             <div class="aspect-video overflow-hidden bg-primary-black">
                                 @if($case->isUploadedVideo() && $case->uploadedVideoUrl())
@@ -24,15 +25,17 @@
                                         controls
                                         preload="metadata"
                                         playsinline
+                                        muted
+                                        data-video-poster
                                         src="{{ $case->uploadedVideoUrl() }}"
                                     >
-                                        {{ $case->localizedTitle() }}
+                                        {{ $caseTitle }}
                                     </video>
                                 @elseif($case->embedUrl())
                                     <iframe
                                         class="h-full w-full"
                                         src="{{ $case->embedUrl() }}"
-                                        title="{{ $case->localizedTitle() }}"
+                                        title="{{ $caseTitle }}"
                                         loading="lazy"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                         allowfullscreen
@@ -40,13 +43,13 @@
                                     ></iframe>
                                 @elseif($case->thumbnailUrl())
                                     <a href="{{ $case->youtube_url }}" target="_blank" rel="noopener">
-                                        <img src="{{ $case->thumbnailUrl() }}" alt="{{ $case->localizedTitle() }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                                        <img src="{{ $case->thumbnailUrl() }}" alt="{{ $caseTitle }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                                     </a>
                                 @else
                                     <div class="flex h-full items-center justify-center text-xs tracking-widest text-white/30">SINO GOOD</div>
                                 @endif
                             </div>
-                            <h2 class="mt-4 text-lg font-medium text-white">{{ $case->localizedTitle() }}</h2>
+                            <h2 class="mt-4 text-lg font-medium text-white">{{ $caseTitle }}</h2>
                             @if($case->localizedDescription())
                                 <p class="mt-2 text-sm leading-relaxed text-white/60">{{ $case->localizedDescription() }}</p>
                             @endif

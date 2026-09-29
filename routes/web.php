@@ -21,6 +21,7 @@ Route::prefix('{locale}')
     ->group(function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('/about', [PageController::class, 'about'])->name('about');
+        Route::get('/faq', [PageController::class, 'faq'])->name('faq');
         Route::get('/cases', [CaseStudyController::class, 'index'])->name('cases.index');
         Route::get('/contact', [PageController::class, 'contact'])->name('contact');
         Route::post('/contact', [PageController::class, 'sendContact'])->name('contact.send');
