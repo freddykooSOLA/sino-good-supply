@@ -69,6 +69,13 @@ return [
     'faq_title' => 'FAQ',
     'faq_intro' => 'Common questions about working with SINO GOOD on hotel supply projects.',
     'faq_draft_notice' => 'Draft placeholder content — awaiting confirmation from Sino-Good. Answers below are general guidance only, not final commitments.',
+    'social_feed' => 'Latest updates',
+    'seo' => [
+        'home' => [
+            'title' => 'SINO GOOD — European hotel supply chain',
+            'description' => 'Customized hospitality supply solutions for European hotel projects — briefing, sourcing, QC, and delivery.',
+        ],
+    ],
     'faq_items' => [
         [
             'q' => 'How long does a typical order process take?',

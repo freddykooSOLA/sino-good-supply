@@ -35,6 +35,10 @@ return [
         ],
     ],
 
+    'ffmpeg' => [
+        'path' => env('FFMPEG_PATH', 'ffmpeg'),
+    ],
+
     'facebook' => [
         'page_url' => env('FACEBOOK_PAGE_URL'),
         'access_token' => env('FACEBOOK_ACCESS_TOKEN'),

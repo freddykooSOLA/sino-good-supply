@@ -67,6 +67,21 @@ class CaseStudyResource extends Resource
                     ->required(fn (Get $get): bool => $get('video_type') === CaseStudy::VIDEO_UPLOAD)
                     ->visible(fn (Get $get): bool => $get('video_type') === CaseStudy::VIDEO_UPLOAD)
                     ->columnSpanFull(),
+                Forms\Components\FileUpload::make('poster_path')
+                    ->label('视频封面 (JPG)')
+                    ->helperText('可上传覆盖自动生成的封面；留空则使用 ffmpeg 生成的海报')
+                    ->disk('public')
+                    ->directory('case-posters')
+                    ->image()
+                    ->visibility('public')
+                    ->visible(fn (Get $get): bool => $get('video_type') === CaseStudy::VIDEO_UPLOAD),
+                Forms\Components\FileUpload::make('poster_webp_path')
+                    ->label('视频封面 (WebP)')
+                    ->disk('public')
+                    ->directory('case-posters')
+                    ->acceptedFileTypes(['image/webp'])
+                    ->visibility('public')
+                    ->visible(fn (Get $get): bool => $get('video_type') === CaseStudy::VIDEO_UPLOAD),
                 TranslationForm::toolbar([
                     'title_en' => ['zh' => 'title_zh', 'zh_hant' => 'title_zh_hant'],
                     'description_en' => ['zh' => 'description_zh', 'zh_hant' => 'description_zh_hant'],

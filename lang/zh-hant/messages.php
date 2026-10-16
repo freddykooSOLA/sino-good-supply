@@ -69,6 +69,13 @@ return [
     'faq_title' => '常見問題',
     'faq_intro' => '關於與 SINO GOOD 合作酒店用品項目的常見問題。',
     'faq_draft_notice' => '以下為草稿占位內容，待 Sino-Good 確認後替換。回答僅供一般說明，不構成最終承諾。',
+    'social_feed' => '最新動態',
+    'seo' => [
+        'home' => [
+            'title' => 'SINO GOOD — 歐洲酒店供應鏈',
+            'description' => '為歐洲酒店項目提供定制用品供應鏈服務：簡報、採購、質檢與交付。',
+        ],
+    ],
     'faq_items' => [
         [
             'q' => '訂購流程一般需要多久？',

@@ -22,6 +22,8 @@ class CaseStudy extends Model
         'youtube_url',
         'youtube_id',
         'video_path',
+        'poster_path',
+        'poster_webp_path',
         'sort_order',
         'is_active',
     ];
@@ -63,6 +65,12 @@ class CaseStudy extends Model
         static::deleting(function (CaseStudy $case) {
             if ($case->video_path) {
                 Storage::disk('public')->delete($case->video_path);
+            }
+            if ($case->poster_path) {
+                Storage::disk('public')->delete($case->poster_path);
+            }
+            if ($case->poster_webp_path) {
+                Storage::disk('public')->delete($case->poster_webp_path);
             }
         });
     }
@@ -132,6 +140,19 @@ class CaseStudy extends Model
         }
 
         return Storage::disk('public')->url($this->video_path);
+    }
+
+    public function posterUrl(): ?string
+    {
+        if ($this->poster_webp_path && Storage::disk('public')->exists($this->poster_webp_path)) {
+            return Storage::disk('public')->url($this->poster_webp_path);
+        }
+
+        if ($this->poster_path && Storage::disk('public')->exists($this->poster_path)) {
+            return Storage::disk('public')->url($this->poster_path);
+        }
+
+        return null;
     }
 
     public function thumbnailUrl(): ?string

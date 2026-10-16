@@ -151,6 +151,37 @@ if (! function_exists('case_study_display_title')) {
     }
 }
 
+if (! function_exists('hero_image_sources')) {
+    /**
+     * @return array{src: string, webp: ?string, width: ?int, height: ?int}
+     */
+    function hero_image_sources(?string $path): array
+    {
+        $src = public_storage_url($path) ?? '';
+        $webp = null;
+        $width = null;
+        $height = null;
+
+        if ($path && \Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+            $absolute = \Illuminate\Support\Facades\Storage::disk('public')->path($path);
+            if (function_exists('getimagesize')) {
+                $size = @getimagesize($absolute);
+                if (is_array($size)) {
+                    $width = $size[0] ?? null;
+                    $height = $size[1] ?? null;
+                }
+            }
+
+            $webpPath = preg_replace('/\.(jpe?g|png)$/i', '.webp', $path);
+            if ($webpPath && \Illuminate\Support\Facades\Storage::disk('public')->exists($webpPath)) {
+                $webp = public_storage_url($webpPath);
+            }
+        }
+
+        return compact('src', 'webp', 'width', 'height');
+    }
+}
+
 if (! function_exists('google_maps_embed_src')) {
     function google_maps_embed_src(?string $raw): ?string
     {

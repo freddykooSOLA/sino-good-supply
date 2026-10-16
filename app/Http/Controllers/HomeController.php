@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CaseStudy;
 use App\Models\Category;
 use App\Models\Setting;
-use App\Services\FacebookFeedService;
+use App\Services\SocialFeedService;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -20,7 +20,7 @@ class HomeController extends Controller
         $coreBusiness = Setting::getValue('core_business', []) ?: [];
         $orderProcess = Setting::getValue('order_process', []) ?: [];
         $advantages = Setting::getValue('advantages', []) ?: [];
-        $facebookPosts = app(FacebookFeedService::class)->latest(3);
+        $socialPosts = app(SocialFeedService::class)->latest(6);
         $latestNews = Setting::getValue('latest_news', []) ?: [];
         $visibleCategoryIds = Setting::getValue('visible_category_ids', []) ?: [];
 
@@ -47,7 +47,7 @@ class HomeController extends Controller
             'featuredCases',
             'orderProcess',
             'advantages',
-            'facebookPosts',
+            'socialPosts',
             'latestNews',
         ));
     }

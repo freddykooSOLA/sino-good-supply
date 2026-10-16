@@ -26,7 +26,7 @@
                                         preload="metadata"
                                         playsinline
                                         muted
-                                        data-video-poster
+                                        @if($case->posterUrl()) poster="{{ $case->posterUrl() }}" @else data-video-poster @endif
                                         src="{{ $case->uploadedVideoUrl() }}"
                                     >
                                         {{ $caseTitle }}

@@ -13,7 +13,7 @@
         $processHeading = homepage_heading('order_process', __('messages.order_process_title'), __('messages.order_process_intro'));
         $advHeading = homepage_heading('advantages', __('messages.our_advantages'), '');
         $catHeading = homepage_heading('product_categories', __('messages.our_categories'), __('messages.tagline'));
-        $fbHeading = homepage_heading('facebook_posts', __('messages.facebook_latest'), '');
+        $socialHeading = homepage_heading('facebook_posts', __('messages.social_feed'), '');
         $newsHeading = homepage_heading('latest_news', __('messages.latest_news'), '');
         $processImage = $orderProcess['flowchart_image'] ?? null;
         $processSteps = collect($orderProcess['steps'] ?? [])->filter(fn ($step) => is_array($step))->values();
@@ -37,11 +37,21 @@
                     @if($index === 0) data-active="1" @endif
                 >
                     @if(!empty($slide['image']))
-                        <img
-                            src="{{ public_storage_url($slide['image']) }}"
-                            alt=""
-                            class="hero-slide h-full w-full object-cover opacity-80"
-                        >
+                        @php $heroSrc = hero_image_sources($slide['image']); @endphp
+                        <picture>
+                            @if($heroSrc['webp'])
+                                <source srcset="{{ $heroSrc['webp'] }}" type="image/webp">
+                            @endif
+                            <img
+                                src="{{ $heroSrc['src'] }}"
+                                @if($heroSrc['width']) width="{{ $heroSrc['width'] }}" @endif
+                                @if($heroSrc['height']) height="{{ $heroSrc['height'] }}" @endif
+                                alt=""
+                                class="hero-slide h-full w-full object-cover opacity-80"
+                                @if($index === 0) fetchpriority="high" loading="eager" @else loading="lazy" @endif
+                                decoding="async"
+                            >
+                        </picture>
                     @else
                         <div class="h-full w-full bg-[radial-gradient(ellipse_at_top_right,_rgba(201,168,76,0.28),_transparent_55%),linear-gradient(160deg,#1a1a1a_0%,#2c2c2c_55%,#151515_100%)]"></div>
                     @endif
@@ -337,23 +347,36 @@
         </section>
     @endif
 
-    {{-- Facebook --}}
-    @if(!empty($facebookPosts))
+    {{-- Social feed --}}
+    @if(!empty($socialPosts))
         <section class="border-y border-white/10 bg-primary-black">
             <div class="section-pad">
-                <h2 class="section-title">{{ $fbHeading['title'] }}</h2>
-                @if($fbHeading['subtitle'])
-                    <p class="section-sub">{{ $fbHeading['subtitle'] }}</p>
+                <h2 class="section-title">{{ $socialHeading['title'] }}</h2>
+                @if($socialHeading['subtitle'])
+                    <p class="section-sub">{{ $socialHeading['subtitle'] }}</p>
                 @endif
                 <div class="mt-12 grid gap-6 md:grid-cols-3">
-                    @foreach($facebookPosts as $post)
+                    @foreach($socialPosts as $post)
+                        @php
+                            $platform = $post['platform'] ?? 'manual';
+                            $platformLabel = match ($platform) {
+                                'instagram' => 'Instagram',
+                                'youtube' => 'YouTube',
+                                'facebook' => 'Facebook',
+                                default => 'SINO GOOD',
+                            };
+                        @endphp
                         <a href="{{ $post['link'] ?? '#' }}" target="_blank" rel="noopener" class="group flex flex-col border border-white/10 bg-charcoal transition hover:border-gold-accent/50">
                             @if(!empty($post['image']))
-                                <img src="{{ media_url($post['image']) }}" alt="" class="aspect-[4/3] w-full object-cover">
+                                <img src="{{ media_url($post['image']) }}" alt="" class="aspect-[4/3] w-full object-cover" loading="lazy" decoding="async">
                             @endif
                             <div class="flex flex-1 flex-col p-6">
-                                <p class="text-sm leading-relaxed text-white/70">{{ localized_setting($post, 'text') }}</p>
-                                <span class="mt-4 inline-block text-sm text-gold-accent">Facebook →</span>
+                                <div class="text-xs font-semibold uppercase tracking-wider text-gold-accent">{{ $platformLabel }}</div>
+                                @if(!empty($post['created_at']))
+                                    <time class="mt-1 text-xs text-white/45" datetime="{{ $post['created_at'] }}">{{ \Illuminate\Support\Carbon::parse($post['created_at'])->format('Y-m-d') }}</time>
+                                @endif
+                                <p class="mt-3 text-sm leading-relaxed text-white/70">{{ $post['text'] ?? '' }}</p>
+                                <span class="mt-4 inline-block text-sm text-gold-accent">{{ $platformLabel }} →</span>
                             </div>
                         </a>
                     @endforeach

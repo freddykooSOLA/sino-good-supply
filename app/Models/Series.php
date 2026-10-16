@@ -90,6 +90,14 @@ class Series extends Model
         return $this->imageUrls()[0] ?? null;
     }
 
+    public function firstImagePath(): ?string
+    {
+        $images = $this->images ?? [];
+        $first = $images[0] ?? null;
+
+        return StoredFilePath::normalize(is_array($first) ? ($first[0] ?? null) : $first);
+    }
+
     public function imageUrls(): array
     {
         $apply = (bool) $this->watermark_images;

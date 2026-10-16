@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SeoAssetController;
 use App\Http\Controllers\WatermarkedImageController;
 use App\Http\Controllers\CaseStudyController;
 use App\Http\Controllers\HomeController;
@@ -7,9 +8,14 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SeriesController;
 use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\ShareSeoData;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/en');
+
+Route::get('/sitemap.xml', [SeoAssetController::class, 'sitemap'])->name('sitemap');
+Route::get('/llms.txt', [SeoAssetController::class, 'llms'])->name('llms');
+Route::get('/robots.txt', [SeoAssetController::class, 'robots'])->name('robots');
 
 Route::get('/media/wm/{encoded}', [WatermarkedImageController::class, 'show'])
     ->where('encoded', '[A-Za-z0-9\-_]+')
@@ -17,7 +23,7 @@ Route::get('/media/wm/{encoded}', [WatermarkedImageController::class, 'show'])
 
 Route::prefix('{locale}')
     ->whereIn('locale', ['en', 'zh', 'zh-hant'])
-    ->middleware(SetLocale::class)
+    ->middleware([SetLocale::class, ShareSeoData::class])
     ->group(function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('/about', [PageController::class, 'about'])->name('about');

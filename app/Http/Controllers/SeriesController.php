@@ -45,11 +45,12 @@ class SeriesController extends Controller
 
         $seriesList = $query->paginate(12)->withQueryString();
         $pageHero = page_hero('products');
+        $request->attributes->set('seo_page_context', $seriesList);
 
         return view('pages.series-index', compact('seriesList', 'categories', 'activeCategory', 'pageHero'));
     }
 
-    public function show(string $locale, string $slug): View
+    public function show(Request $request, string $locale, string $slug): View
     {
         $series = Series::query()
             ->with('category')
@@ -68,6 +69,8 @@ class SeriesController extends Controller
 
         $pageHero = page_hero('products');
         $watermark = WatermarkSetting::current()->frontendConfig();
+
+        $request->attributes->set('seo_page_context', $series);
 
         return view('pages.series-show', compact('series', 'related', 'pageHero', 'watermark'));
     }
