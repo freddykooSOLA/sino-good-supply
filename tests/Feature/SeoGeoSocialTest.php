@@ -28,7 +28,29 @@ class SeoGeoSocialTest extends TestCase
             ->assertOk()
             ->assertSee('Sitemap:', false)
             ->assertSee('GPTBot', false)
-            ->assertSee('ClaudeBot', false);
+            ->assertSee('ClaudeBot', false)
+            ->assertSee('PerplexityBot', false)
+            ->assertSee('Google-Extended', false)
+            ->assertSee('OAI-SearchBot', false)
+            ->assertDontSee("Disallow:\n", false);
+    }
+
+    public function test_homepage_og_image_uses_cropped_jpg_not_favicon(): void
+    {
+        Setting::setValue('hero_slides', [
+            ['image' => 'series/demo/series-1.jpg', 'title_en' => 'Hero'],
+        ]);
+
+        $response = $this->get('/en');
+        $response->assertOk();
+        $response->assertDontSee('og:image" content="'.url('/favicon.ico').'"', false);
+        $response->assertSee('property="og:image" content="'.url('/og/'), false);
+
+        preg_match('/property="og:image" content="([^"]+)"/', $response->getContent(), $matches);
+        $this->assertNotEmpty($matches[1] ?? null);
+        $this->get(parse_url($matches[1], PHP_URL_PATH))
+            ->assertOk()
+            ->assertHeader('content-type', 'image/jpeg');
     }
 
     public function test_homepage_includes_canonical_hreflang_and_json_ld(): void

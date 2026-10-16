@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\CaseStudy;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Series;
@@ -13,8 +14,10 @@ class SeoService
 {
     public const LOCALES = ['en', 'zh', 'zh-hant'];
 
+    public function __construct(protected OgImageService $ogImages) {}
+
     /**
-     * @return array{title: string, description: string, canonical: string, og_image: ?string, robots: ?string, hreflang: array<string, string>, breadcrumbs: list<array{name: string, url: string}>}
+     * @return array{title: string, description: string, canonical: string, og_image: ?string, og_image_width: int, og_image_height: int, robots: ?string, hreflang: array<string, string>, breadcrumbs: list<array{name: string, url: string}>}
      */
     public function resolve(Request $request): array
     {
@@ -27,13 +30,13 @@ class SeoService
         $description = (string) __('messages.tagline');
 
         match ($routeName) {
-            'home' => [$title, $description] = $this->pageCopy('home', $locale),
+            'home' => [$title, $description, $ogImage] = $this->homeMeta($locale),
             'about' => [$title, $description, $breadcrumbs] = $this->withCrumb($locale, 'about', __('messages.about_title'), __('messages.about_intro')),
             'faq' => [$title, $description, $breadcrumbs] = $this->withCrumb($locale, 'faq', __('messages.faq_title'), __('messages.faq_intro')),
-            'cases.index' => [$title, $description, $breadcrumbs] = $this->withCrumb($locale, 'cases', __('messages.cases_title'), __('messages.cases_intro')),
+            'cases.index' => [$title, $description, $breadcrumbs, $ogImage] = $this->casesMeta($locale),
             'contact' => [$title, $description, $breadcrumbs] = $this->withCrumb($locale, 'contact', __('messages.contact_us'), __('messages.get_in_touch')),
             'order-process' => [$title, $description, $breadcrumbs] = $this->withCrumb($locale, 'order-process', __('messages.order_process_title'), __('messages.order_process_intro')),
-            'products.index', 'category.show' => [$title, $description, $breadcrumbs] = $this->productsMeta($request, $locale),
+            'products.index', 'category.show' => [$title, $description, $breadcrumbs, $ogImage] = $this->productsMeta($request, $locale),
             'series.show' => [$title, $description, $breadcrumbs, $ogImage] = $this->seriesMeta($request, $locale),
             'product.show' => [$title, $description, $breadcrumbs, $ogImage] = $this->productMeta($request, $locale),
             default => null,
@@ -43,11 +46,15 @@ class SeoService
             $title = $title.' — SINO GOOD';
         }
 
+        $dimensions = $this->ogImages->dimensionsForUrl((string) $ogImage);
+
         return [
             'title' => $title,
             'description' => Str::limit(strip_tags($description), 160, ''),
             'canonical' => $canonical,
             'og_image' => $ogImage,
+            'og_image_width' => $dimensions['width'],
+            'og_image_height' => $dimensions['height'],
             'robots' => null,
             'hreflang' => $this->hreflangAlternates($request),
             'breadcrumbs' => $breadcrumbs,
@@ -123,6 +130,45 @@ class SeoService
     }
 
     /**
+     * @return array{0: string, 1: string, 2: string}
+     */
+    protected function homeMeta(string $locale): array
+    {
+        [$title, $description] = $this->pageCopy('home', $locale);
+        $slides = Setting::getValue('hero_slides', []) ?: [];
+        $first = is_array($slides[0] ?? null) ? $slides[0] : null;
+        $ogImage = ($first && ! empty($first['image']))
+            ? ($this->ogImages->urlForStoragePath((string) $first['image']) ?? $this->defaultOgImage())
+            : $this->defaultOgImage();
+
+        return [$title, $description, $ogImage];
+    }
+
+    /**
+     * @return array{0: string, 1: string, 2: list<array{name: string, url: string}>, 3: string}
+     */
+    protected function casesMeta(string $locale): array
+    {
+        [$title, $description, $breadcrumbs] = $this->withCrumb(
+            $locale,
+            'cases',
+            __('messages.cases_title'),
+            __('messages.cases_intro')
+        );
+        $ogImage = $this->defaultOgImage();
+        $case = CaseStudy::query()
+            ->whereNotNull('poster_path')
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->first();
+        if ($case?->poster_path) {
+            $ogImage = $this->ogImages->urlForStoragePath($case->poster_path) ?? $ogImage;
+        }
+
+        return [$title, $description, $breadcrumbs, $ogImage];
+    }
+
+    /**
      * @return array{0: string, 1: string, 2: list<array{name: string, url: string}>}
      */
     protected function withCrumb(string $locale, string $path, string $title, string $description): array
@@ -138,7 +184,7 @@ class SeoService
     }
 
     /**
-     * @return array{0: string, 1: string, 2: list<array{name: string, url: string}>}
+     * @return array{0: string, 1: string, 2: list<array{name: string, url: string}>, 3: string}
      */
     protected function productsMeta(Request $request, string $locale): array
     {
@@ -149,6 +195,11 @@ class SeoService
             ['name' => __('messages.breadcrumb_home'), 'url' => locale_url('', $locale)],
             ['name' => $title, 'url' => locale_url('products', $locale)],
         ];
+        $ogImage = $this->defaultOgImage();
+        $series = Series::query()->active()->orderBy('sort_order')->first();
+        if ($series) {
+            $ogImage = $this->ogImages->urlForStoragePath($series->firstImagePath()) ?? $ogImage;
+        }
 
         if ($slug) {
             $category = Category::query()->active()->where(function ($q) use ($slug, $locale) {
@@ -167,11 +218,11 @@ class SeoService
             }
         }
 
-        return [$title, $description, $breadcrumbs];
+        return [$title, $description, $breadcrumbs, $ogImage];
     }
 
     /**
-     * @return array{0: string, 1: string, 2: list<array{name: string, url: string}>, 3: ?string}
+     * @return array{0: string, 1: string, 2: list<array{name: string, url: string}>, 3: string}
      */
     protected function seriesMeta(Request $request, string $locale): array
     {
@@ -188,7 +239,7 @@ class SeoService
         if ($series) {
             $title = $series->localizedName($locale);
             $description = $series->localizedIntro($locale) ?: $description;
-            $ogImage = $this->absoluteImage($series->firstImagePath()) ?? $ogImage;
+            $ogImage = $this->ogImages->urlForStoragePath($series->firstImagePath()) ?? $ogImage;
             if ($series->category) {
                 $breadcrumbs[] = [
                     'name' => $series->category->localizedName($locale),
@@ -202,7 +253,7 @@ class SeoService
     }
 
     /**
-     * @return array{0: string, 1: string, 2: list<array{name: string, url: string}>, 3: ?string}
+     * @return array{0: string, 1: string, 2: list<array{name: string, url: string}>, 3: string}
      */
     protected function productMeta(Request $request, string $locale): array
     {
@@ -221,7 +272,8 @@ class SeoService
         if ($product) {
             $title = $product->localizedName($locale);
             $description = $product->localizedShortDesc($locale) ?: $description;
-            $ogImage = $this->absoluteImage($product->firstImagePath()) ?? $ogImage;
+            $seriesPath = $product->series?->firstImagePath();
+            $ogImage = $this->ogImages->urlForStoragePath($seriesPath) ?? $ogImage;
             if ($product->series) {
                 $breadcrumbs[] = [
                     'name' => $product->series->localizedName($locale),
@@ -234,20 +286,9 @@ class SeoService
         return [$title, $description, $breadcrumbs, $ogImage];
     }
 
-    protected function defaultOgImage(): ?string
+    protected function defaultOgImage(): string
     {
-        $slides = Setting::getValue('hero_slides', []) ?: [];
-        $first = is_array($slides[0] ?? null) ? $slides[0] : null;
-        if ($first && ! empty($first['image'])) {
-            return $this->absoluteImage($first['image']);
-        }
-
-        $contact = site_contact();
-        if (! empty($contact['media_image'])) {
-            return $this->absoluteImage($contact['media_image']);
-        }
-
-        return url('/favicon.ico');
+        return $this->ogImages->brandDefaultUrl();
     }
 
     protected function absoluteImage(?string $path): ?string

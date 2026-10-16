@@ -80,6 +80,8 @@ class FacebookFeedTest extends TestCase
             ],
         ]);
 
+        $this->artisan('social:sync')->assertSuccessful();
+
         $this->get('/en')
             ->assertOk()
             ->assertSee('Auto Facebook post from connected page')

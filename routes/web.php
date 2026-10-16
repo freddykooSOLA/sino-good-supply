@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OgImageController;
 use App\Http\Controllers\SeoAssetController;
 use App\Http\Controllers\WatermarkedImageController;
 use App\Http\Controllers\CaseStudyController;
@@ -16,6 +17,7 @@ Route::redirect('/', '/en');
 Route::get('/sitemap.xml', [SeoAssetController::class, 'sitemap'])->name('sitemap');
 Route::get('/llms.txt', [SeoAssetController::class, 'llms'])->name('llms');
 Route::get('/robots.txt', [SeoAssetController::class, 'robots'])->name('robots');
+Route::get('/og/{token}.jpg', [OgImageController::class, 'show'])->where('token', '[a-f0-9]{40}')->name('og.image');
 
 Route::get('/media/wm/{encoded}', [WatermarkedImageController::class, 'show'])
     ->where('encoded', '[A-Za-z0-9\-_]+')

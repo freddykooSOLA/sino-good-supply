@@ -2,9 +2,25 @@
 
 @section('title', 'SINO GOOD')
 
+@php
+    $slidesForPreload = collect($slides ?? [])->filter(fn ($slide) => is_array($slide))->values();
+    $firstSlide = $slidesForPreload->first();
+    $preloadHero = ! empty($firstSlide['image']) ? hero_image_sources($firstSlide['image']) : null;
+@endphp
+
+@if($preloadHero && ($preloadHero['webp'] || $preloadHero['src']))
+    @push('head')
+        @if($preloadHero['webp'])
+            <link rel="preload" as="image" href="{{ $preloadHero['webp'] }}" type="image/webp" fetchpriority="high">
+        @else
+            <link rel="preload" as="image" href="{{ $preloadHero['src'] }}" fetchpriority="high">
+        @endif
+    @endpush
+@endif
+
 @section('content')
     @php
-        $slides = collect($slides ?? [])->filter(fn ($slide) => is_array($slide))->values();
+        $slides = $slidesForPreload;
         $hero = $hero ?? ['autoplay' => true, 'speed' => 5000];
         $autoplay = ! empty($hero['autoplay']) && $slides->count() > 1;
         $speed = max(2000, (int) ($hero['speed'] ?? 5000));

@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></noscript>
     @include('partials.seo-head')
-    @include('partials.json-ld')
+    @stack('head')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-primary-black text-white antialiased">
@@ -134,6 +134,8 @@
             &copy; {{ date('Y') }} {{ localized_setting($contact, 'company') ?: 'SINO GOOD QY SUPPLY CHAIN CO., LTD' }}
         </div>
     </footer>
+
+    @include('partials.json-ld')
 
     <script>
         document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {

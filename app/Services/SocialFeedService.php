@@ -22,8 +22,8 @@ class SocialFeedService
     public function latest(int $limit = 6): array
     {
         try {
-            $posts = Cache::remember(self::CACHE_KEY, self::CACHE_SECONDS, fn () => $this->syncAll());
-            if (! empty($posts)) {
+            $posts = Cache::get(self::CACHE_KEY);
+            if (is_array($posts) && $posts !== []) {
                 return array_slice($posts, 0, $limit);
             }
         } catch (Throwable $e) {
