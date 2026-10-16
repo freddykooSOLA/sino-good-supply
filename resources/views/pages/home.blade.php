@@ -17,6 +17,7 @@
         $newsHeading = homepage_heading('latest_news', __('messages.latest_news'), '');
         $processImage = $orderProcess['flowchart_image'] ?? null;
         $processSteps = collect($orderProcess['steps'] ?? [])->filter(fn ($step) => is_array($step))->values();
+        $marqueeItems = $categories->map(fn ($category) => $category->localizedName())->filter()->values();
     @endphp
 
     {{-- Hero --}}
@@ -39,7 +40,7 @@
                         <img
                             src="{{ public_storage_url($slide['image']) }}"
                             alt=""
-                            class="h-full w-full object-cover opacity-[0.68] {{ $autoplay ? 'hero-slide' : '' }}"
+                            class="hero-slide h-full w-full object-cover opacity-80"
                         >
                     @else
                         <div class="h-full w-full bg-[radial-gradient(ellipse_at_top_right,_rgba(201,168,76,0.28),_transparent_55%),linear-gradient(160deg,#1a1a1a_0%,#2c2c2c_55%,#151515_100%)]"></div>
@@ -63,14 +64,14 @@
                         @if($index !== 0) hidden @endif
                     >
                         <div class="mb-5 text-sm font-semibold tracking-[0.28em] text-gold-accent">SINO GOOD</div>
-                        <h1 class="hero-headline text-3xl font-semibold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
+                        <h1 class="hero-headline hero-headline-display" data-hero-headline>
                             {{ localized_setting($slide, 'title') ?: 'SINO GOOD' }}
                         </h1>
                         <p class="mt-5 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg">
                             {{ localized_setting($slide, 'subtitle') ?: __('messages.tagline') }}
                         </p>
                         <div class="mt-8 flex flex-wrap gap-3 sm:gap-4">
-                            <a href="{{ $slide['link'] ?? locale_url('products') }}" class="btn-gold">
+                            <a href="{{ $slide['link'] ?? locale_url('products') }}" class="btn-gold" data-magnetic>
                                 {{ localized_setting($slide, 'button_text') ?: __('messages.explore') }}
                             </a>
                             <a href="{{ locale_url('contact') }}" class="btn-outline">{{ __('messages.contact_us') }}</a>
@@ -79,10 +80,10 @@
                 @empty
                     <div>
                         <div class="mb-5 text-sm font-semibold tracking-[0.28em] text-gold-accent">SINO GOOD</div>
-                        <h1 class="hero-headline text-3xl font-semibold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">SINO GOOD</h1>
+                        <h1 class="hero-headline hero-headline-display" data-hero-headline>SINO GOOD</h1>
                         <p class="mt-5 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg">{{ __('messages.tagline') }}</p>
                         <div class="mt-8 flex flex-wrap gap-4">
-                            <a href="{{ locale_url('products') }}" class="btn-gold">{{ __('messages.explore') }}</a>
+                            <a href="{{ locale_url('products') }}" class="btn-gold" data-magnetic>{{ __('messages.explore') }}</a>
                             <a href="{{ locale_url('contact') }}" class="btn-outline">{{ __('messages.contact_us') }}</a>
                         </div>
                     </div>
@@ -109,9 +110,9 @@
 
     {{-- Core business --}}
     @if(!empty($coreBusiness))
-        <section class="bg-charcoal">
-            <div class="section-pad">
-                <div class="fade-in">
+        <section class="section-light">
+            <div class="section-pad" data-reveal>
+                <div data-reveal-child>
                     <h2 class="section-title">{{ $coreHeading['title'] }}</h2>
                     @if($coreHeading['subtitle'])
                         <p class="section-sub">{{ $coreHeading['subtitle'] }}</p>
@@ -123,14 +124,19 @@
                             $coreIcons = ['briefcase', 'cube', 'truck'];
                             $coreIcon = $coreIcons[$index % count($coreIcons)];
                         @endphp
-                        <article class="border border-white/10 bg-primary-black p-8">
+                        <article class="overflow-hidden border border-primary-black/10 bg-white shadow-sm" data-reveal-child>
                             @if(!empty($item['image']))
-                                <img src="{{ public_storage_url($item['image']) }}" alt="" class="mb-6 h-12 w-12 object-contain">
-                            @else
-                                <div class="mb-6">@include('partials.line-icon', ['name' => $coreIcon])</div>
+                                <div class="aspect-[16/10] overflow-hidden">
+                                    <img src="{{ public_storage_url($item['image']) }}" alt="" class="h-full w-full object-cover transition duration-700 hover:scale-105" loading="lazy">
+                                </div>
                             @endif
-                            <h3 class="text-lg font-medium text-white">{{ localized_setting($item, 'title') }}</h3>
-                            <p class="mt-3 text-sm leading-relaxed text-white/60">{{ localized_setting($item, 'description') }}</p>
+                            <div class="p-8">
+                                @if(empty($item['image']))
+                                    <div class="mb-6 text-gold-accent">@include('partials.line-icon', ['name' => $coreIcon])</div>
+                                @endif
+                                <h3 class="text-lg font-medium text-primary-black">{{ localized_setting($item, 'title') }}</h3>
+                                <p class="mt-3 text-sm leading-relaxed text-primary-black/65">{{ localized_setting($item, 'description') }}</p>
+                            </div>
                         </article>
                     @endforeach
                 </div>
@@ -140,9 +146,9 @@
 
     {{-- Featured cases --}}
     @if(!empty($featuredCases))
-        <section class="border-y border-white/10 bg-primary-black">
-            <div class="section-pad">
-                <div class="flex items-end justify-between gap-6">
+        <section class="section-dark border-y border-white/10">
+            <div class="section-pad" data-reveal>
+                <div class="flex items-end justify-between gap-6" data-reveal-child>
                     <div>
                         <h2 class="section-title">{{ $casesHeading['title'] }}</h2>
                         @if($casesHeading['subtitle'])
@@ -153,8 +159,8 @@
                 </div>
                 <div class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach($featuredCases as $item)
-                        <article class="group">
-                            <div class="aspect-video overflow-hidden bg-charcoal">
+                        <article class="group" data-reveal-child>
+                            <div class="card-image aspect-video bg-charcoal">
                                 @if(!empty($item['resolved_video']))
                                     <video class="h-full w-full object-cover" controls preload="metadata" playsinline muted data-video-poster src="{{ $item['resolved_video'] }}"></video>
                                 @elseif(!empty($item['resolved_embed']))
@@ -178,28 +184,39 @@
 
     {{-- Order process --}}
     @if($processImage || $processSteps->isNotEmpty())
-        <section class="bg-charcoal">
-            <div class="section-pad">
-                <div class="flex items-end justify-between gap-6">
+        <section class="section-gold">
+            <div class="section-pad" data-reveal>
+                <div class="flex items-end justify-between gap-6" data-reveal-child>
                     <div>
                         <h2 class="section-title">{{ $processHeading['title'] }}</h2>
                         @if($processHeading['subtitle'])
                             <p class="section-sub">{{ $processHeading['subtitle'] }}</p>
                         @endif
                     </div>
-                    <a href="{{ locale_url('order-process') }}" class="hidden text-sm text-gold-accent hover:underline md:inline">{{ __('messages.view_details') }} →</a>
+                    <a href="{{ locale_url('order-process') }}" class="hidden text-sm font-medium text-primary-black/80 hover:text-primary-black md:inline">{{ __('messages.view_details') }} →</a>
                 </div>
                 @if($processImage)
-                    <a href="{{ locale_url('order-process') }}" class="mt-10 block overflow-hidden border border-white/10 bg-primary-black">
-                        <img src="{{ public_storage_url($processImage) }}" alt="{{ $processHeading['title'] }}" class="h-auto w-full">
+                    <a href="{{ locale_url('order-process') }}" class="mt-10 block overflow-hidden border border-primary-black/10 bg-primary-black/5" data-reveal-child>
+                        <img src="{{ public_storage_url($processImage) }}" alt="{{ $processHeading['title'] }}" class="h-auto w-full" loading="lazy">
                     </a>
-                @else
-                    <ol class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                @elseif($processSteps->isNotEmpty())
+                    <div class="process-pin mt-12 hidden lg:block" data-process-pin data-reveal-child>
+                        <div class="process-pin__track" data-process-track>
+                            @foreach($processSteps->take(6) as $index => $step)
+                                <article class="process-pin__step" data-process-step>
+                                    <div class="text-xs font-semibold tracking-[0.2em] text-primary-black/70">{{ str_pad((string) ($step['step'] ?? ($index + 1)), 2, '0', STR_PAD_LEFT) }}</div>
+                                    <h3 class="mt-4 text-xl font-semibold text-primary-black">{{ localized_setting($step, 'title') }}</h3>
+                                    <p class="mt-3 text-sm leading-relaxed text-primary-black/70">{{ localized_setting($step, 'description') }}</p>
+                                </article>
+                            @endforeach
+                        </div>
+                    </div>
+                    <ol class="mt-12 grid gap-8 lg:hidden">
                         @foreach($processSteps->take(6) as $index => $step)
-                            <li class="border-l border-gold-accent/50 pl-5">
-                                <div class="text-xs tracking-[0.2em] text-gold-accent">{{ str_pad((string) ($step['step'] ?? ($index + 1)), 2, '0', STR_PAD_LEFT) }}</div>
-                                <h3 class="mt-3 text-lg font-medium text-white">{{ localized_setting($step, 'title') }}</h3>
-                                <p class="mt-3 text-sm leading-relaxed text-white/60">{{ localized_setting($step, 'description') }}</p>
+                            <li class="border-l-2 border-primary-black/30 pl-5" data-reveal-child>
+                                <div class="text-xs font-semibold tracking-[0.2em] text-primary-black/70">{{ str_pad((string) ($step['step'] ?? ($index + 1)), 2, '0', STR_PAD_LEFT) }}</div>
+                                <h3 class="mt-3 text-lg font-semibold text-primary-black">{{ localized_setting($step, 'title') }}</h3>
+                                <p class="mt-3 text-sm leading-relaxed text-primary-black/70">{{ localized_setting($step, 'description') }}</p>
                             </li>
                         @endforeach
                     </ol>
@@ -209,9 +226,9 @@
     @endif
 
     {{-- Advantages --}}
-    <section class="border-y border-white/10 bg-primary-black">
-        <div class="section-pad">
-            <h2 class="section-title">{{ $advHeading['title'] }}</h2>
+    <section class="section-dark border-y border-white/10">
+        <div class="section-pad" data-reveal>
+            <h2 class="section-title" data-reveal-child>{{ $advHeading['title'] }}</h2>
             @if($advHeading['subtitle'])
                 <p class="section-sub">{{ $advHeading['subtitle'] }}</p>
             @endif
@@ -221,9 +238,11 @@
                         $advIcons = ['shield-check', 'truck', 'wrench-screwdriver', 'globe-alt'];
                         $advIcon = $advIcons[$index % count($advIcons)];
                     @endphp
-                    <div>
+                    <div data-reveal-child>
                         @if(!empty($item['image']))
-                            <img src="{{ public_storage_url($item['image']) }}" alt="" class="mb-4 h-10 w-10 object-contain">
+                            <div class="mb-4 aspect-[4/3] max-w-[200px] overflow-hidden rounded-sm">
+                                <img src="{{ public_storage_url($item['image']) }}" alt="" class="h-full w-full object-cover" loading="lazy">
+                            </div>
                         @else
                             <div class="mb-4">@include('partials.line-icon', ['name' => $advIcon, 'class' => 'h-7 w-7 text-gold-accent'])</div>
                         @endif
@@ -247,7 +266,7 @@
             </div>
 
             @if(!empty($stats))
-                <div class="mt-16 border-t border-white/10 pt-12">
+                <div class="mt-16 border-t border-white/10 pt-12" data-reveal-child>
                     <div class="mb-8 flex items-center gap-3 text-white/50">
                         @include('partials.line-icon', ['name' => 'chart-bar', 'class' => 'h-5 w-5 text-gold-accent/80'])
                         <span class="h-px flex-1 bg-gradient-to-r from-gold-accent/40 to-transparent"></span>
@@ -255,7 +274,7 @@
                     <div class="grid grid-cols-2 gap-8 md:grid-cols-4 md:gap-6">
                         @foreach($stats as $stat)
                             <div class="md:border-l md:border-white/10 md:pl-6 first:md:border-l-0 first:md:pl-0">
-                                <div class="text-3xl font-semibold text-gold-accent">{{ $stat['value'] ?? '' }}</div>
+                                <div class="text-4xl font-semibold text-gold-accent md:text-5xl" data-count="{{ $stat['value'] ?? '' }}">{{ $stat['value'] ?? '' }}</div>
                                 <div class="mt-2 text-sm text-white/55">{{ localized_setting($stat, 'label') }}</div>
                             </div>
                         @endforeach
@@ -266,38 +285,57 @@
     </section>
 
     {{-- Categories --}}
-    <section class="bg-charcoal">
-        <div class="section-pad">
-            <div class="fade-in">
+    <section class="section-light">
+        <div class="section-pad" data-reveal>
+            <div data-reveal-child>
                 <h2 class="section-title">{{ $catHeading['title'] }}</h2>
                 <p class="section-sub">{{ $catHeading['subtitle'] }}</p>
             </div>
-            <div class="mt-12 grid gap-px bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach($categories as $index => $category)
                     @php $previewImage = $category->previewImageUrl(); @endphp
                     <a href="{{ locale_url('category/'.$category->localizedSlug()) }}"
-                       class="group relative min-h-[260px] overflow-hidden bg-primary-black p-8 transition">
+                       class="card-image group relative min-h-[280px] overflow-hidden bg-primary-black"
+                       data-reveal-child>
                         @if($previewImage)
                             <img
                                 src="{{ $previewImage }}"
                                 alt="{{ $category->localizedName() }}"
-                                class="absolute inset-0 h-full w-full object-cover opacity-45 transition duration-700 group-hover:scale-105 group-hover:opacity-55"
+                                class="card-image__media absolute inset-0 opacity-90"
                                 loading="lazy"
                             >
+                        @else
+                            <div class="absolute inset-0 bg-gradient-to-br from-primary-black via-charcoal to-gold-accent/30"></div>
                         @endif
-                        <div class="absolute inset-0 bg-gradient-to-t from-primary-black via-primary-black/55 to-primary-black/20"></div>
-                        <div class="relative z-10 flex h-full min-h-[196px] flex-col justify-end">
-                            <div class="text-xs uppercase tracking-[0.2em] text-gold-accent/80">0{{ $index + 1 }}</div>
-                            <div class="mt-4 text-xl font-medium text-white transition group-hover:text-gold-accent">
+                        <div class="card-image__overlay"></div>
+                        <div class="relative z-10 flex h-full min-h-[280px] flex-col justify-end p-8">
+                            <div class="text-xs uppercase tracking-[0.2em] text-gold-accent">0{{ $index + 1 }}</div>
+                            <div class="mt-3 text-2xl font-semibold text-white">
                                 {{ $category->localizedName() }}
                             </div>
-                            <div class="mt-3 text-sm text-white/50 transition group-hover:text-white/70">{{ __('messages.view_series') }} →</div>
+                            <span class="card-image__arrow mt-4">{{ __('messages.view_series') }} →</span>
                         </div>
                     </a>
                 @endforeach
             </div>
         </div>
     </section>
+
+    @if($marqueeItems->isNotEmpty())
+        <section class="section-dark border-y border-white/10 py-10">
+            <p class="mb-6 text-center text-xs font-semibold uppercase tracking-[0.28em] text-white/45">{{ __('messages.marquee_label') }}</p>
+            <div class="marquee" data-marquee>
+                <div class="marquee__track" data-marquee-track>
+                    @foreach($marqueeItems as $label)
+                        <span class="marquee__item">{{ $label }}</span>
+                        <span class="marquee__item text-gold-accent">•</span>
+                    @endforeach
+                    <span class="marquee__item">{{ __('messages.marquee_europe') }}</span>
+                    <span class="marquee__item text-gold-accent">•</span>
+                </div>
+            </div>
+        </section>
+    @endif
 
     {{-- Facebook --}}
     @if(!empty($facebookPosts))
@@ -326,59 +364,40 @@
 
     {{-- Latest news --}}
     @if(!empty($latestNews))
-        <section class="bg-charcoal">
-            <div class="section-pad">
-                <h2 class="section-title">{{ $newsHeading['title'] }}</h2>
-                @if($newsHeading['subtitle'])
-                    <p class="section-sub">{{ $newsHeading['subtitle'] }}</p>
-                @endif
-                <div class="mt-12 divide-y divide-white/10 border-y border-white/10">
+        <section class="section-light">
+            <div class="section-pad" data-reveal>
+                <div data-reveal-child>
+                    <h2 class="section-title">{{ $newsHeading['title'] }}</h2>
+                    @if($newsHeading['subtitle'])
+                        <p class="section-sub">{{ $newsHeading['subtitle'] }}</p>
+                    @endif
+                </div>
+                <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                     @foreach($latestNews as $news)
                         @php
                             $newsImages = collect($news['images'] ?? [])
                                 ->map(fn ($path) => media_url(is_array($path) ? ($path[0] ?? null) : $path))
                                 ->filter()
                                 ->values();
-                            $newsHasSlider = $newsImages->count() > 1;
+                            $coverImage = $newsImages->first();
                         @endphp
-                        <article class="grid gap-8 py-8 {{ $newsImages->isNotEmpty() ? 'md:grid-cols-2' : '' }}">
-                            @if($newsImages->isNotEmpty())
-                                <div
-                                    class="product-slider relative aspect-[4/3] overflow-hidden bg-primary-black"
-                                    @if($newsHasSlider) data-product-slider @endif
-                                >
-                                    <div class="product-slider__track flex h-full transition-transform duration-300 ease-out" data-slider-track>
-                                        @foreach($newsImages as $index => $image)
-                                            <div class="h-full w-full shrink-0">
-                                                <img src="{{ $image }}" alt="{{ localized_setting($news, 'title') }}" class="h-full w-full object-cover" loading="{{ $index === 0 ? 'eager' : 'lazy' }}" draggable="false">
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                    @if($newsHasSlider)
-                                        <button type="button" class="product-slider__nav left-3" data-slider-prev aria-label="Previous image">
-                                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M12.79 5.23a.75.75 0 01-.02 1.06L9.06 10l3.71 3.71a.75.75 0 11-1.06 1.06l-4.25-4.25a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.08.02z"/></svg>
-                                        </button>
-                                        <button type="button" class="product-slider__nav right-3" data-slider-next aria-label="Next image">
-                                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M7.21 14.77a.75.75 0 01.02-1.06L10.94 10 7.23 6.29a.75.75 0 111.06-1.06l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.08-.02z"/></svg>
-                                        </button>
-                                        <div class="absolute bottom-3 left-0 right-0 z-10 flex justify-center gap-1.5" data-slider-dots>
-                                            @foreach($newsImages as $index => $image)
-                                                <button type="button" class="product-slider__dot {{ $index === 0 ? 'is-active' : '' }}" data-slider-dot="{{ $index }}" aria-label="Image {{ $index + 1 }}"></button>
-                                            @endforeach
-                                        </div>
-                                    @endif
+                        <article class="news-card" data-reveal-child>
+                            @if($coverImage)
+                                <div class="card-image aspect-[4/3]">
+                                    <img src="{{ $coverImage }}" alt="{{ localized_setting($news, 'title') }}" class="card-image__media h-full w-full" loading="lazy">
+                                    <div class="card-image__overlay"></div>
                                 </div>
                             @endif
-                            <div>
+                            <div class="flex flex-1 flex-col p-6">
                                 @if(!empty($news['date']))
-                                    <div class="text-xs tracking-wider text-gold-accent/80">{{ $news['date'] }}</div>
+                                    <time class="text-xs font-medium uppercase tracking-wider text-gold-accent">{{ $news['date'] }}</time>
                                 @endif
-                                <h3 class="mt-2 text-xl font-medium text-white">{{ localized_setting($news, 'title') }}</h3>
+                                <h3 class="mt-2 text-lg font-semibold text-primary-black">{{ localized_setting($news, 'title') }}</h3>
                                 @if(localized_setting($news, 'excerpt'))
-                                    <p class="mt-3 max-w-3xl text-sm leading-relaxed text-white/60">{{ localized_setting($news, 'excerpt') }}</p>
+                                    <p class="mt-3 line-clamp-3 text-sm leading-relaxed text-primary-black/65">{{ localized_setting($news, 'excerpt') }}</p>
                                 @endif
                                 @if(!empty($news['link']))
-                                    <a href="{{ $news['link'] }}" class="mt-4 inline-block text-sm text-gold-accent">{{ __('messages.view_details') }} →</a>
+                                    <a href="{{ $news['link'] }}" class="card-image__arrow mt-5 text-primary-black">{{ __('messages.view_details') }} →</a>
                                 @endif
                             </div>
                         </article>

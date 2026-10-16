@@ -65,8 +65,26 @@ class Category extends Model
 
     public function previewImageUrl(): ?string
     {
-        return $this->previewSeries?->thumbnailUrl()
+        $url = $this->previewSeries?->thumbnailUrl()
             ?? $this->previewProduct?->thumbnailUrl();
+
+        if ($url) {
+            return $url;
+        }
+
+        foreach ($this->series()->where('is_active', true)->orderBy('sort_order')->get() as $series) {
+            if ($thumb = $series->thumbnailUrl()) {
+                return $thumb;
+            }
+        }
+
+        foreach ($this->products()->where('is_active', true)->orderBy('sort_order')->limit(12)->get() as $product) {
+            if ($thumb = $product->thumbnailUrl()) {
+                return $thumb;
+            }
+        }
+
+        return null;
     }
 
     public function localizedName(?string $locale = null): string

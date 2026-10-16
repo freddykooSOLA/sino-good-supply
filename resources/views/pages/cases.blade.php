@@ -9,7 +9,7 @@
         'subtitle' => localized_setting($pageHero, 'subtitle') ?: __('messages.cases_intro'),
     ])
 
-    <section class="bg-charcoal">
+    <section class="section-dark">
         <div class="mx-auto max-w-7xl px-4 py-16 lg:px-8">
             @if($cases->isEmpty())
                 <p class="text-white/55">{{ __('messages.no_cases') }}</p>

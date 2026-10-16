@@ -1,4 +1,5 @@
 import './bootstrap';
+import { initMotion } from './motion';
 
 function initProductSliders(root = document) {
     root.querySelectorAll('[data-product-slider]').forEach((slider) => {
@@ -154,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initHomeHero();
     initCaseVideoPosters();
     initPdfPreview();
+    initMotion();
 });
 
 function initCaseVideoPosters() {

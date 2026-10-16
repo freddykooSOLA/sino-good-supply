@@ -11,7 +11,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
 </head>
-<body class="bg-charcoal text-white antialiased">
+<body class="bg-primary-black text-white antialiased">
+    <div class="page-transition" data-page-transition aria-hidden="true"></div>
     @php
         $contact = site_contact();
         $categories = nav_categories();

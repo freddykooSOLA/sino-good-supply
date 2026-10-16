@@ -10,7 +10,7 @@
         'compact' => true,
     ])
 
-    <section class="bg-charcoal">
+    <section class="section-dark">
         <div class="mx-auto max-w-7xl px-4 py-8 text-sm text-white/50 lg:px-8">
             <a href="{{ locale_url() }}" class="hover:text-gold-accent">{{ __('messages.breadcrumb_home') }}</a>
             <span class="mx-2">/</span>

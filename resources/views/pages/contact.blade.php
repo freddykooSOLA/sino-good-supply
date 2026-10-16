@@ -18,7 +18,7 @@
         'subtitle' => localized_setting($pageHero, 'subtitle') ?: __('messages.tagline'),
     ])
 
-    <section class="bg-charcoal">
+    <section class="section-light">
         <div class="mx-auto grid max-w-7xl gap-12 px-4 py-16 lg:grid-cols-2 lg:px-8">
             <div>
                 <h2 class="text-xl font-medium text-white">{{ localized_setting($contact, 'company') ?: __('messages.company_footer') }}</h2>

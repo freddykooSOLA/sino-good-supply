@@ -14,6 +14,7 @@ export default {
                 'primary-black': '#1a1a1a',
                 charcoal: '#2c2c2c',
                 'gold-accent': '#c9a84c',
+                'surface-light': '#f4f4f2',
             },
             fontFamily: {
                 sans: ['Inter', ...defaultTheme.fontFamily.sans],

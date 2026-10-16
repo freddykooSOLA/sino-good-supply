@@ -15,8 +15,8 @@
         'subtitle' => localized_setting($pageHero, 'subtitle') ?: $heading['subtitle'],
     ])
 
-    <section class="bg-charcoal">
-        <div class="section-pad">
+    <section class="section-light">
+        <div class="section-pad" data-reveal>
             @if($flowchart)
                 <div class="overflow-hidden border border-white/10 bg-primary-black">
                     <img src="{{ public_storage_url($flowchart) }}" alt="{{ $heading['title'] }}" class="h-auto w-full">

@@ -13,6 +13,8 @@ return [
     'cases_intro' => 'Selected hotel and hospitality projects delivered with SINO GOOD customized supply solutions.',
     'no_cases' => 'Case studies coming soon.',
     'tagline' => 'High-quality customized service solutions for Europe\'s finest hotels — we don\'t just sell products.',
+    'marquee_label' => 'European hotel supply segments',
+    'marquee_europe' => 'European hospitality projects',
     'view_details' => 'View Details',
     'view_series' => 'View Series',
     'all_products' => 'All Series',

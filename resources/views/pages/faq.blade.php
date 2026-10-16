@@ -10,7 +10,7 @@
         'compact' => true,
     ])
 
-    <section class="bg-charcoal">
+    <section class="section-light">
         <div class="section-pad">
             <p class="max-w-3xl text-sm leading-relaxed text-white/55">
                 {{ __('messages.faq_draft_notice') }}

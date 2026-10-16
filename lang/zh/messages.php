@@ -13,6 +13,8 @@ return [
     'cases_intro' => '精选酒店项目案例，展示 SINO GOOD 高质定制服务方案。',
     'no_cases' => '案例即将上线。',
     'tagline' => '为欧洲精品酒店提供高质定制服务方案，而非单纯卖产品。',
+    'marquee_label' => '欧洲酒店供应链品类',
+    'marquee_europe' => '欧洲酒店项目',
     'view_details' => '查看详情',
     'view_series' => '查看系列',
     'all_products' => '全部系列',

@@ -11,7 +11,7 @@
         'subtitle' => localized_setting($pageHero, 'subtitle') ?: __('messages.tagline'),
     ])
 
-    <section class="bg-charcoal">
+    <section class="section-dark">
         <div class="mx-auto grid max-w-7xl gap-10 px-4 py-14 lg:grid-cols-[240px_1fr] lg:px-8">
             <aside>
                 <div class="text-xs font-medium uppercase tracking-wider text-white/40">{{ __('messages.filter_by_category') }}</div>
