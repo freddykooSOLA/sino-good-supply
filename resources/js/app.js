@@ -1,5 +1,4 @@
 import './bootstrap';
-import { initMotion } from './motion';
 
 function initProductSliders(root = document) {
     root.querySelectorAll('[data-product-slider]').forEach((slider) => {
@@ -155,7 +154,13 @@ document.addEventListener('DOMContentLoaded', () => {
     initHomeHero();
     initCaseVideoPosters();
     initPdfPreview();
-    initMotion();
+
+    const bootMotion = () => import('./motion').then(({ initMotion }) => initMotion());
+    if (typeof window.requestIdleCallback === 'function') {
+        window.requestIdleCallback(bootMotion, { timeout: 1200 });
+    } else {
+        window.setTimeout(bootMotion, 1);
+    }
 });
 
 function initCaseVideoPosters() {
