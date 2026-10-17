@@ -18,13 +18,11 @@
                         tabindex="{{ $index === 0 ? 0 : -1 }}"
                         @if($index > 0) aria-hidden="true" @endif
                     >
-                        <img
-                            src="{{ $image }}"
-                            alt="{{ $series->localizedName() }}"
-                            class="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                            loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
-                            draggable="false"
-                        >
+                        @include('partials.whole-image', [
+                            'src' => $image,
+                            'alt' => $series->localizedName(),
+                            'loading' => $index === 0 ? 'eager' : 'lazy',
+                        ])
                     </a>
                 @endforeach
             </div>

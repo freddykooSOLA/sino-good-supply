@@ -8,11 +8,12 @@
 <section class="relative overflow-hidden bg-primary-black {{ $compact ? 'min-h-[42vh] pt-28' : 'min-h-[55vh] pt-28' }}">
     <div class="absolute inset-0">
         @if($heroImage)
-            <img
-                src="{{ public_storage_url($heroImage) }}"
-                alt=""
-                class="h-full w-full object-cover opacity-[0.65]"
-            >
+            @include('partials.whole-image', [
+                'src' => public_storage_url($heroImage),
+                'class' => 'h-full w-full pt-20 md:pt-0',
+                'mediaClass' => 'object-top opacity-80 md:object-center',
+                'loading' => 'eager',
+            ])
         @else
             <div class="h-full w-full bg-[radial-gradient(ellipse_at_top_right,_rgba(201,168,76,0.22),_transparent_55%),linear-gradient(160deg,#1a1a1a_0%,#2c2c2c_55%,#151515_100%)]"></div>
         @endif

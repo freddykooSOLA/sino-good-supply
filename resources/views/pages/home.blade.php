@@ -54,20 +54,23 @@
                 >
                     @if(!empty($slide['image']))
                         @php $heroSrc = hero_image_sources($slide['image']); @endphp
-                        <picture>
-                            @if($heroSrc['webp'])
-                                <source srcset="{{ $heroSrc['webp'] }}" type="image/webp">
-                            @endif
-                            <img
-                                src="{{ $heroSrc['src'] }}"
-                                @if($heroSrc['width']) width="{{ $heroSrc['width'] }}" @endif
-                                @if($heroSrc['height']) height="{{ $heroSrc['height'] }}" @endif
-                                alt=""
-                                class="hero-slide h-full w-full object-cover opacity-80"
-                                @if($index === 0) fetchpriority="high" loading="eager" @else loading="lazy" @endif
-                                decoding="async"
-                            >
-                        </picture>
+                        <div class="whole-image h-full w-full pt-20 md:pt-0">
+                            <img src="{{ $heroSrc['webp'] ?: $heroSrc['src'] }}" alt="" aria-hidden="true" class="whole-image__backdrop hero-slide" @if($index === 0) loading="eager" @else loading="lazy" @endif decoding="async">
+                            <picture>
+                                @if($heroSrc['webp'])
+                                    <source srcset="{{ $heroSrc['webp'] }}" type="image/webp">
+                                @endif
+                                <img
+                                    src="{{ $heroSrc['src'] }}"
+                                    @if($heroSrc['width']) width="{{ $heroSrc['width'] }}" @endif
+                                    @if($heroSrc['height']) height="{{ $heroSrc['height'] }}" @endif
+                                    alt=""
+                                    class="whole-image__media object-top opacity-90 md:object-center"
+                                    @if($index === 0) fetchpriority="high" loading="eager" @else loading="lazy" @endif
+                                    decoding="async"
+                                >
+                            </picture>
+                        </div>
                     @else
                         <div class="h-full w-full bg-[radial-gradient(ellipse_at_top_right,_rgba(201,168,76,0.28),_transparent_55%),linear-gradient(160deg,#1a1a1a_0%,#2c2c2c_55%,#151515_100%)]"></div>
                     @endif
@@ -324,12 +327,11 @@
                        class="card-image group relative min-h-[280px] overflow-hidden bg-primary-black"
                        data-reveal-child>
                         @if($previewImage)
-                            <img
-                                src="{{ $previewImage }}"
-                                alt="{{ $category->localizedName() }}"
-                                class="card-image__media absolute inset-0 opacity-90"
-                                loading="lazy"
-                            >
+                            @include('partials.whole-image', [
+                                'src' => $previewImage,
+                                'alt' => $category->localizedName(),
+                                'class' => 'absolute inset-0 opacity-90',
+                            ])
                         @else
                             <div class="absolute inset-0 bg-gradient-to-br from-primary-black via-charcoal to-gold-accent/30"></div>
                         @endif
