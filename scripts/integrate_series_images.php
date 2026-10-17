@@ -2,6 +2,8 @@
 
 /**
  * SG-001: Wire real product images + intros into Series records.
+ * SG-005: hotel-supplies / JW sources are whole photos cut at their own edges
+ *         (scripts/extract_whole_images.py), never full catalogue pages.
  * Run: php scripts/integrate_series_images.php
  */
 
@@ -30,9 +32,9 @@ function seriesPlan(): array
         'boutique-guestroom-programme' => [
             'category' => 'hotel-supplies',
             'sources' => [
-                'hotel-supplies/hotel-supplies_p0015_img1.jpg',
-                'hotel-supplies/hotel-supplies_p0060_img1.jpg',
-                'hotel-supplies/hotel-supplies_p0040_img1.jpg',
+                'whole-cuts/hotel-supplies_coffee-grounds-amenities.jpg',
+                'whole-cuts/hotel-supplies_hilton-memory-foam-pillow.jpg',
+                'whole-cuts/hotel-supplies_coffee-grounds-toiletries.jpg',
             ],
             'intro_en' => 'A coordinated guestroom programme from Guangdong Zhixincheng (K·SHORE / Tanina): biodegradable coffee-grounds amenity kits, hair-and-body-care miniatures (30–50ml), and Hilton Resorts Home dual-core memory-foam bedding — packaged as a private-label guestroom scheme for boutique hotels.',
             'intro_zh' => '广东挚心成（K·SHORE / 天丽悦焕）精品客房方案：可降解咖啡渣环保客房用品、30–50ML 洗护小瓶系列，以及双芯双感记忆棉床品，可按酒店品牌定制包装，成套交付客房配套。',
@@ -41,9 +43,9 @@ function seriesPlan(): array
         'lobby-public-area-collection' => [
             'category' => 'hotel-supplies',
             'sources' => [
-                'hotel-supplies/hotel-supplies_p0023_img1.jpg',
-                'hotel-supplies/hotel-supplies_p0040_img1.jpg',
-                'hotel-supplies/hotel-supplies_p0015_img1.jpg',
+                'whole-cuts/hotel-supplies_acrylic-amenity-kit.jpg',
+                'whole-cuts/hotel-supplies_coffee-grounds-toiletries.jpg',
+                'whole-cuts/hotel-supplies_coffee-grounds-amenities.jpg',
             ],
             'intro_en' => 'Public-area amenity upgrades for lobbies and lounge zones: acrylic-look translucent packaging for toothbrush kits, razors, combs and soap, coordinated with Zhixincheng\'s 28-year hotel-supplies manufacturing programme.',
             'intro_zh' => '面向大堂与公共休息区的客房用品升级线：亚克力质感通透包装的牙具、剃须刀、梳子与香皂套装，由挚心成 28 年酒店用品制造体系统筹供应。',
@@ -52,10 +54,10 @@ function seriesPlan(): array
         'hotel-operating-supplies-series' => [
             'category' => 'hotel-supplies',
             'sources' => [
-                'hotel-supplies/hotel-supplies_p0040_img1.jpg',
-                'hotel-supplies/hotel-supplies_p0023_img1.jpg',
-                'hotel-supplies/hotel-supplies_p0015_img1.jpg',
-                'hotel-supplies/hotel-supplies_p0060_img1.jpg',
+                'whole-cuts/hotel-supplies_acrylic-amenity-kit.jpg',
+                'whole-cuts/hotel-supplies_coffee-grounds-amenities.jpg',
+                'whole-cuts/hotel-supplies_coffee-grounds-toiletries.jpg',
+                'whole-cuts/hotel-supplies_hilton-memory-foam-pillow.jpg',
             ],
             'intro_en' => 'Repeatable hotel operating supplies from K·SHORE and Tanina: guest amenity kits, toiletry miniatures, slippers and bedding — QC, private-label packaging and export logistics under one programme.',
             'intro_zh' => 'K·SHORE / 天丽悦焕酒店营运物资：客房全套用品、洗护小瓶、拖鞋与床品，支持贴牌定制包装，品质管控与出口物流一体完成。',
@@ -114,7 +116,10 @@ function seriesPlan(): array
         'jw-custom-extrusion-series' => [
             'category' => 'jw-custom-profiles',
             'sources' => [
-                'jw-profiles/jw-profiles_p0008_img1.jpeg',
+                'whole-cuts/jw-profiles_p08-room1.jpg',
+                'whole-cuts/jw-profiles_p08-room2.jpg',
+                'whole-cuts/jw-profiles_p08-room3.jpg',
+                'whole-cuts/jw-profiles_p08-room4.jpg',
             ],
             'intro_en' => 'JW custom extrusion profiles — moon-board (M50), half-moon (S7015), half-round (M128) and arc (S60) sections in wood-look finish, 3m lengths, for tea rooms, bedroom headboards and feature-wall framing.',
             'intro_zh' => 'JW 定制挤出型材：月牙板 M50、半月板 S7015、半圆板 M128、圆弧板 S60 等木纹饰面截面，标准 3 米/支，用于茶室、床头背景墙与电视墙收边。',
@@ -123,7 +128,10 @@ function seriesPlan(): array
         'architectural-trim-collection' => [
             'category' => 'jw-custom-profiles',
             'sources' => [
-                'jw-profiles/jw-profiles_p0020_img1.jpeg',
+                'whole-cuts/jw-profiles_p20-room1.jpg',
+                'whole-cuts/jw-profiles_p20-room2.jpg',
+                'whole-cuts/jw-profiles_p20-room3.jpg',
+                'whole-cuts/jw-profiles_p20-room4.jpg',
             ],
             'intro_en' => 'JW architectural trim profiles — combination board (M196), flat/V board (M120V), wave board (M137) and mid board (M195) — supplied as matched perimeter trims for entry mirrors, marble accents and wet-area junctions.',
             'intro_zh' => 'JW 建筑收边型材：组合板 M196、平板/V 板 M120V、波浪板 M137、中板 M195 等，作为玄关镜面、大理石背景墙与湿区界面的配套收边组合。',

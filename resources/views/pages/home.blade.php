@@ -36,11 +36,16 @@
                     @if($index === 0) data-active="1" @endif
                 >
                     @if(!empty($slide['image']))
-                        <img
-                            src="{{ public_storage_url($slide['image']) }}"
-                            alt=""
-                            class="h-full w-full object-cover opacity-[0.68] {{ $autoplay ? 'hero-slide' : '' }}"
-                        >
+                        <div class="whole-image h-full w-full pt-20 md:pt-0">
+                            <img src="{{ public_storage_url($slide['image']) }}" alt="" aria-hidden="true" class="whole-image__backdrop {{ $autoplay ? 'hero-slide' : '' }}" decoding="async">
+                            <img
+                                src="{{ public_storage_url($slide['image']) }}"
+                                alt=""
+                                class="whole-image__media object-top opacity-90 md:object-center"
+                                @if($index === 0) fetchpriority="high" loading="eager" @else loading="lazy" @endif
+                                decoding="async"
+                            >
+                        </div>
                     @else
                         <div class="h-full w-full bg-[radial-gradient(ellipse_at_top_right,_rgba(201,168,76,0.28),_transparent_55%),linear-gradient(160deg,#1a1a1a_0%,#2c2c2c_55%,#151515_100%)]"></div>
                     @endif
@@ -278,12 +283,11 @@
                     <a href="{{ locale_url('category/'.$category->localizedSlug()) }}"
                        class="group relative min-h-[260px] overflow-hidden bg-primary-black p-8 transition">
                         @if($previewImage)
-                            <img
-                                src="{{ $previewImage }}"
-                                alt="{{ $category->localizedName() }}"
-                                class="absolute inset-0 h-full w-full object-cover opacity-45 transition duration-700 group-hover:scale-105 group-hover:opacity-55"
-                                loading="lazy"
-                            >
+                            @include('partials.whole-image', [
+                                'src' => $previewImage,
+                                'alt' => $category->localizedName(),
+                                'class' => 'absolute inset-0 opacity-60 transition duration-700 group-hover:opacity-75',
+                            ])
                         @endif
                         <div class="absolute inset-0 bg-gradient-to-t from-primary-black via-primary-black/55 to-primary-black/20"></div>
                         <div class="relative z-10 flex h-full min-h-[196px] flex-col justify-end">

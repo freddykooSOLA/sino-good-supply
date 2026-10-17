@@ -41,13 +41,12 @@
                                     onclick="openLightbox('{{ $image }}')"
                                     aria-label="{{ $series->localizedName() }} image {{ $index + 1 }}"
                                 >
-                                    <img
-                                        src="{{ $image }}"
-                                        alt="{{ $series->localizedName() }}"
-                                        class="h-full w-full cursor-zoom-in object-cover"
-                                        loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
-                                        draggable="false"
-                                    >
+                                    @include('partials.whole-image', [
+                                        'src' => $image,
+                                        'alt' => $series->localizedName(),
+                                        'mediaClass' => 'cursor-zoom-in',
+                                        'loading' => $index === 0 ? 'eager' : 'lazy',
+                                    ])
                                 </button>
                             @endforeach
                         </div>
@@ -79,7 +78,7 @@
                                 data-slider-dot="{{ $index }}"
                                 aria-label="Show image {{ $index + 1 }}"
                             >
-                                <img src="{{ $image }}" alt="" class="h-full w-full object-cover" loading="lazy" draggable="false">
+                                @include('partials.whole-image', ['src' => $image])
                             </button>
                         @endforeach
                     </div>
